@@ -1,8 +1,11 @@
-# antennahead.github.io
+# antennahead-app.github.io
 
 Project site for **[AntennaHead](https://github.com/dsward2/AntennaHead)** and
 **[ControlBooth](https://github.com/dsward2/ControlBooth)** — a plain static
-site (no Jekyll) served by GitHub Pages.
+site (no Jekyll) served by GitHub Pages at **<https://antennahead-app.github.io>**.
+
+Lives in the `antennahead-app` org (the plain `antennahead` name was already
+taken); the app code stays under the personal `dsward2` account.
 
 ```
 index.html            Overview / landing page
@@ -29,31 +32,20 @@ python3 -m http.server 8777
 Opening the files over `file://` will not work — the demo uses `XMLHttpRequest`
 to load its fragments.
 
-## Publishing (one-time)
+## Publishing
 
-This repo is named for an **organization** so it publishes at the bare
-`https://antennahead.github.io` (a user repo would be `dsward2.github.io`).
+Already published: pushing to `main` of `antennahead-app/antennahead.github.io`
+rebuilds <https://antennahead-app.github.io> automatically (GitHub Pages,
+source = branch `main`, path `/`). A build takes ~30 s; check status with:
 
-1. **Create the org** — <https://github.com/organizations/plan> → *Free* →
-   name it `antennahead`.
-2. **Create the repo** — new repository in that org named **exactly**
-   `antennahead.github.io`, public, empty.
-3. **Push this folder:**
-   ```bash
-   cd antennahead.github.io
-   git init -b main
-   git add -A
-   git commit -m "Initial project site"
-   git remote add origin git@github.com:antennahead/antennahead.github.io.git
-   git push -u origin main
-   ```
-4. **Enable Pages** — repo *Settings → Pages →* Source = *Deploy from a branch*,
-   Branch = `main` / `/ (root)`, Save. First build takes a minute or two;
-   the site then lives at <https://antennahead.github.io>.
+```bash
+gh api /repos/antennahead-app/antennahead-app.github.io/pages/builds/latest \
+  --jq '{status, error: .error.message}'
+```
 
-For a user site instead, name the repo `dsward2.github.io`, push it to your own
-account, and the URL becomes `https://dsward2.github.io`. No content changes
-needed — all links here are relative.
+All links in the pages are relative, so the site also works unchanged if it is
+ever moved to a different repo, an `<org>.github.io` root, or a custom domain
+(add a `CNAME` file for the latter).
 
 ## Adding the demo videos
 
