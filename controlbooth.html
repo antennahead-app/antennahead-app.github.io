@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ControlBooth</title>
+<meta name="description" content="ControlBooth: the unsandboxed macOS companion to AntennaHead for building custom command-line audio pipelines.">
+<link rel="icon" type="image/png" href="demo/images/favicon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="dot"></span> AntennaHead</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="antennahead.html">AntennaHead</a>
+      <a href="controlbooth.html">ControlBooth</a>
+      <a href="demo/index.html">Live UI demo</a>
+      <a href="https://github.com/dsward2/ControlBooth">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill">macOS app &middot; companion</span>
+      <h1>ControlBooth</h1>
+      <p class="lede">
+        The unsandboxed companion to AntennaHead. It runs user-defined process
+        pipelines &mdash; tool piped into tool via stdin/stdout &mdash; and
+        delivers the resulting PCM audio to AntennaHead over UDP for streaming.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="https://github.com/dsward2/ControlBooth">Source &amp; setup &rarr;</a>
+        <a class="btn" href="antennahead.html">See AntennaHead</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Why a separate app</h2>
+      <p class="sub">
+        AntennaHead is sandboxed and ships only fixed, known-good pipelines.
+        Arbitrary command-line tools &mdash; unsigned Homebrew binaries included
+        &mdash; can't run inside that sandbox. ControlBooth
+        (<code>ENABLE_APP_SANDBOX = NO</code>) is where that freedom lives, so
+        AntennaHead stays locked down.
+      </p>
+      <div class="grid">
+        <div class="card"><h3>Pipeline editor</h3><p>Chain executables left to right; each stage's <code>stdout</code> feeds the next stage's <code>stdin</code>. A structured argument editor with a helper catalog and validation keeps stages well-formed.</p></div>
+        <div class="card"><h3>Automatic delivery</h3><p>ControlBooth appends <code>PCMUDPSender --exit-with-parent</code> as the final stage, sending raw S16LE PCM to AntennaHead (default port 6019), which forwards it to LiveAudioServer.</p></div>
+        <div class="card"><h3>Example: HD Radio</h3><p><code>nrsc5 &rarr; sox</code> for HD Radio, or any decoder chain you can express on a command line &mdash; without the manual terminal juggling.</p></div>
+        <div class="card"><h3>Shared internals</h3><p>Uses the same <a href="https://github.com/dsward2/PipelineHelpers">PipelineHelpers</a> runner, <a href="https://github.com/dsward2/SharedLogging">SharedLogging</a> viewer, and <a href="https://github.com/dsward2/AirPlayReceiver">AirPlayReceiver</a> as AntennaHead.</p></div>
+        <div class="card"><h3>Devices hub</h3><p>ControlBooth also owns the embedded AirPlay receiver and the cross-app Devices page.</p></div>
+        <div class="card"><h3>Ducking &amp; mixing</h3><p>Sidechain ducking (<code>PCMMixer --duck-input</code>) lets announcements or a live mix drop the main audio underneath them.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="videos">
+    <div class="wrap">
+      <h2>Screen recordings</h2>
+      <p class="sub">
+        ControlBooth is a native SwiftUI app (no browser UI), so these are
+        desktop captures. Drop the <code>.mp4</code> files into
+        <code>/videos/</code> with the names below &mdash; see
+        <a href="videos/README.md">videos/README.md</a>.
+      </p>
+      <div class="video-grid">
+        <figure class="clip landscape">
+          <video controls playsinline muted preload="metadata" data-label="Build a pipeline">
+            <source src="videos/controlbooth-build-pipeline.mp4" type="video/mp4">
+          </video>
+          <figcaption>Building an <code>nrsc5 &rarr; sox</code> pipeline and sending it to AntennaHead.</figcaption>
+        </figure>
+        <figure class="clip landscape">
+          <video controls playsinline muted preload="metadata" data-label="Structured args">
+            <source src="videos/controlbooth-structured-args.mp4" type="video/mp4">
+          </video>
+          <figcaption>The structured argument editor with helper catalog and validation.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Get it</h2>
+      <p class="sub">ControlBooth checks out as a sibling of AntennaHead &mdash; use the <a href="https://github.com/dsward2/antennahead-workspace">antennahead-workspace</a> bootstrap for the local-package layout.</p>
+      <p><a class="btn primary" href="https://github.com/dsward2/ControlBooth">github.com/dsward2/ControlBooth &rarr;</a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    &copy; <span data-year>2026</span> David Sward &middot;
+    <a href="https://github.com/dsward2/ControlBooth">Source on GitHub</a> &middot;
+    <a href="demo/credits.html">Credits &amp; licenses</a>
+  </div>
+</footer>
+
+<script src="assets/js/nav.js"></script>
+</body>
+</html>

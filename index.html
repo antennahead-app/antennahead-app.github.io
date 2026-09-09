@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AntennaHead &amp; ControlBooth</title>
+<meta name="description" content="AntennaHead is a macOS software-defined-radio player with a browser UI. ControlBooth is its unsandboxed pipeline companion. Open source.">
+<link rel="icon" type="image/png" href="demo/images/favicon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="dot"></span> AntennaHead</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="antennahead.html">AntennaHead</a>
+      <a href="controlbooth.html">ControlBooth</a>
+      <a href="demo/index.html">Live UI demo</a>
+      <a href="https://github.com/dsward2/AntennaHead">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill">macOS &middot; software-defined radio</span>
+      <h1>Turn an RTL-SDR dongle into a radio you listen to from any browser.</h1>
+      <p class="lede">
+        <b>AntennaHead</b> tunes the radio, demodulates FM / AM / airband / HD Radio,
+        and streams the audio over your network. <b>ControlBooth</b> is its
+        companion for wiring up custom audio pipelines. Both are free and open source.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="demo/index.html">Try the web UI &rarr;</a>
+        <a class="btn" href="antennahead.html">About AntennaHead</a>
+        <a class="btn" href="controlbooth.html">About ControlBooth</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Two apps, one audio pipeline</h2>
+      <p class="sub">They share a streaming engine, a pipeline runner, and a logging window &mdash; but each has a distinct job.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>AntennaHead</h3>
+          <p>Sandboxed macOS app. Fixed, known-good pipelines: RTL-SDR tuner, audio-input capture, Gqrx bridge, text-to-speech, and playback of recordings. Serves the HTML UI on your LAN over HTTP/HTTPS.</p>
+        </div>
+        <div class="card">
+          <h3>ControlBooth</h3>
+          <p>Unsandboxed companion. Build a chain of command-line tools (<code>nrsc5 &rarr; sox</code>, and the like); ControlBooth appends a UDP sender and ships raw PCM to AntennaHead to stream.</p>
+        </div>
+        <div class="card">
+          <h3>The web UI</h3>
+          <p>A lightweight jQuery/Skeleton front end &mdash; favorites, categories, a touch tuner keypad, high-speed scanning, now-playing status and spatial-audio controls. Runs on phone, tablet or desktop.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="peek">
+    <div class="wrap">
+      <h2>A quick look</h2>
+      <p class="sub">
+        The panel below is the real AntennaHead web UI, running as a static
+        preview with canned data &mdash; navigate it like you would on a phone.
+        The <a href="antennahead.html#demo">AntennaHead page</a> has the full
+        embed plus screen-recorded videos from the iOS Simulator.
+      </p>
+      <div class="phone" style="--w:320px">
+        <div class="screen">
+          <div class="notch"></div>
+          <iframe src="demo/index.html" title="AntennaHead web UI preview" loading="lazy"></iframe>
+        </div>
+      </div>
+      <p class="demo-note">Static preview &middot; no radio connected</p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>The wider project</h2>
+      <p class="sub">AntennaHead and ControlBooth are the front of a small family of repos, all under <a href="https://github.com/dsward2">github.com/dsward2</a>.</p>
+      <div class="repos">
+        <a class="repo" href="https://github.com/dsward2/AntennaHead"><b>AntennaHead</b><span>The macOS SDR player and its web UI.</span></a>
+        <a class="repo" href="https://github.com/dsward2/ControlBooth"><b>ControlBooth</b><span>Unsandboxed custom-pipeline companion app.</span></a>
+        <a class="repo" href="https://github.com/dsward2/AntennaHeadTV"><b>AntennaHeadTV</b><span>tvOS client that talks to the JSON API.</span></a>
+        <a class="repo" href="https://github.com/dsward2/LiveAudioServer"><b>LiveAudioServer</b><span>Headless PCM &rarr; MP3/AAC HTTP streamer.</span></a>
+        <a class="repo" href="https://github.com/dsward2/PipelineHelpers"><b>PipelineHelpers</b><span>The pipeline runner and its stage tools.</span></a>
+        <a class="repo" href="https://github.com/dsward2/AntennaHeadAPI"><b>AntennaHeadAPI</b><span>Codable contract for non-WebKit clients.</span></a>
+        <a class="repo" href="https://github.com/dsward2/AirPlayReceiver"><b>AirPlayReceiver</b><span>Classic AirPlay (RAOP) receive support.</span></a>
+        <a class="repo" href="https://github.com/dsward2/SharedLogging"><b>SharedLogging</b><span>Shared log store and viewer window.</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    &copy; <span data-year>2026</span> David Sward &middot;
+    Built on <a href="https://github.com/dsward2/LocalRadio">LocalRadio</a> &middot;
+    <a href="https://github.com/dsward2/AntennaHead">Source on GitHub</a> &middot;
+    <a href="demo/credits.html">Credits &amp; licenses</a>
+  </div>
+</footer>
+
+<script src="assets/js/nav.js"></script>
+</body>
+</html>

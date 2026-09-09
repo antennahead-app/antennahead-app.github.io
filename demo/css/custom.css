@@ -1,0 +1,976 @@
+/* raleway-100 - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 100;
+  src: url('../fonts/raleway-v11-latin-100.eot'); /* IE9 Compat Modes */
+  src: local('Raleway Thin'), local('Raleway-Thin'),
+       url('../fonts/raleway-v11-latin-100.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-100.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-100.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-100.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-100.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-100italic - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: italic;
+  font-weight: 100;
+  src: url('../fonts/raleway-v11-latin-100italic.eot'); /* IE9 Compat Modes */
+  src: local('Raleway Thin Italic'), local('Raleway-ThinItalic'),
+       url('../fonts/raleway-v11-latin-100italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-100italic.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-100italic.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-100italic.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-100italic.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-200 - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 200;
+  src: url('../fonts/raleway-v11-latin-200.eot'); /* IE9 Compat Modes */
+  src: local('Raleway ExtraLight'), local('Raleway-ExtraLight'),
+       url('../fonts/raleway-v11-latin-200.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-200.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-200.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-200.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-200.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-200italic - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: italic;
+  font-weight: 200;
+  src: url('../fonts/raleway-v11-latin-200italic.eot'); /* IE9 Compat Modes */
+  src: local('Raleway ExtraLight Italic'), local('Raleway-ExtraLightItalic'),
+       url('../fonts/raleway-v11-latin-200italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-200italic.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-200italic.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-200italic.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-200italic.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-300 - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 300;
+  src: url('../fonts/raleway-v11-latin-300.eot'); /* IE9 Compat Modes */
+  src: local('Raleway Light'), local('Raleway-Light'),
+       url('../fonts/raleway-v11-latin-300.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-300.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-300.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-300.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-300.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-300italic - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: italic;
+  font-weight: 300;
+  src: url('../fonts/raleway-v11-latin-300italic.eot'); /* IE9 Compat Modes */
+  src: local('Raleway Light Italic'), local('Raleway-LightItalic'),
+       url('../fonts/raleway-v11-latin-300italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-300italic.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-300italic.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-300italic.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-300italic.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-regular - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/raleway-v11-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Raleway'), local('Raleway-Regular'),
+       url('../fonts/raleway-v11-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-regular.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-italic - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: italic;
+  font-weight: 400;
+  src: url('../fonts/raleway-v11-latin-italic.eot'); /* IE9 Compat Modes */
+  src: local('Raleway Italic'), local('Raleway-Italic'),
+       url('../fonts/raleway-v11-latin-italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-italic.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-italic.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-italic.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-italic.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-600 - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 600;
+  src: url('../fonts/raleway-v11-latin-600.eot'); /* IE9 Compat Modes */
+  src: local('Raleway SemiBold'), local('Raleway-SemiBold'),
+       url('../fonts/raleway-v11-latin-600.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-600.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-600.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-600.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-600.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+/* raleway-600italic - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: italic;
+  font-weight: 600;
+  src: url('../fonts/raleway-v11-latin-600italic.eot'); /* IE9 Compat Modes */
+  src: local('Raleway SemiBold Italic'), local('Raleway-SemiBoldItalic'),
+       url('../fonts/raleway-v11-latin-600italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/raleway-v11-latin-600italic.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/raleway-v11-latin-600italic.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/raleway-v11-latin-600italic.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/raleway-v11-latin-600italic.svg#Raleway') format('svg'); /* Legacy iOS */
+}
+
+.container {
+  max-width: 800px; }
+.header {
+  margin-top: 9rem;
+  text-align: center; }
+.value-prop {
+  margin-top: 1rem; }
+.value-props {
+  margin-top: 4rem;
+  margin-bottom: 4rem; }
+.docs-header {
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  letter-spacing: .2rem;
+  font-weight: 600; }
+.docs-section {
+  border-top: 1px solid #eee;
+  padding: 4rem 0;
+  margin-bottom: 0;}
+.value-img {
+  display: block;
+  text-align: center;
+  margin: 2.5rem auto 0; }
+.example-grid .column,
+.example-grid .columns {
+  background: #EEE;
+  text-align: center;
+  border-radius: 4px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  height: 30px;
+  line-height: 30px;
+  margin-bottom: .75rem;
+  font-weight: 600;
+  letter-spacing: .1rem; }
+.docs-example .row,
+.docs-example.row,
+.docs-example form {
+  margin-bottom: 0; }
+.docs-example h1,
+.docs-example h2,
+.docs-example h3,
+.docs-example h4,
+.docs-example h5,
+.docs-example h6 {
+  margin-bottom: 1rem; }
+.heading-font-size {
+  font-size: 1.2rem;
+  color: #999;
+  letter-spacing: normal; }
+.code-example {
+  margin-top: 1.5rem;
+  margin-bottom: 0; }
+.code-example-body {
+  white-space: pre;
+  word-wrap: break-word }
+.example {
+  position: relative; 
+  margin-top: 4rem; }
+.example-header {
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: .5rem; }
+.example-description {
+  margin-bottom: 1.5rem; }
+.example-screenshot-wrapper {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  height: 250px; }
+.example-screenshot {
+  width: 100%;
+  height: auto; }
+.example-screenshot.coming-soon {
+  width: auto;
+  position: absolute;
+  background: #eee;
+  top: 5px;
+  right: 5px;
+  bottom: 5px;
+  left: 5px; }
+
+/* .navbar {
+  display: none; } */
+
+.navbar,
+.navbar-spacer {
+  display: block;
+  width: 100%;
+  height: 0px;
+  background: lightgray;
+  z-index: 99; }
+
+.navbar-list {
+  list-style: none;
+  width: 2000px;
+  white-space: no-wrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0; }
+.navbar-item {
+  position: relative;
+  float: left;
+  margin-bottom: 0; }
+
+.navbar-link {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .2rem;
+  margin-right: 15px;
+  text-decoration: none;
+  line-height: 6.5rem;
+  white-space: no-wrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #222; }
+.has-docked-nav .navbar {
+  position: fixed;
+  top: 0;
+  left: 0; }
+.has-docked-nav .navbar-spacer {
+  display: block; }
+/* Re-overiding the width 100% declaration to match size of % based container */
+/* 
+.has-docked-nav .navbar > .container {
+  width: 80%; }
+*/
+
+
+a.button.button-primary.two.columns {
+    padding-left: 0px;
+    padding-right: 0px;
+    width: 100%;
+  }
+
+
+/* Larger than phone */
+@media (min-width: 550px) {
+  .header {
+    margin-top: 18rem; }
+  .value-props {
+    margin-top: 9rem;
+    margin-bottom: 7rem; }
+  .value-img {
+    margin-bottom: 1rem; }
+  .example-grid .column,
+  .example-grid .columns {
+    margin-bottom: 1.5rem; }
+  .docs-section {
+    padding: 6rem 0; }
+  .example-send-yourself-copy {
+    float: right;
+    margin-top: 12px; }
+  .example-screenshot-wrapper {
+    position: absolute;
+    width: 48%;
+    height: 100%;
+    left: 0;
+    max-height: none; }
+}
+
+/* Larger than tablet */
+@media (min-width: 750px) {
+  /* Navbar */
+  .navbar + .docs-section {
+    border-top-width: 0; }
+  .navbar,
+  .navbar-spacer {
+    display: block;
+    width: 100%;
+    height: 6.5rem;
+    background: lightgray;
+    z-index: 99;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee; }
+  .navbar-spacer {
+    display: none; }
+  .navbar > .container {
+    width: 100%; }
+  .navbar-list {
+    list-style: none;
+    margin-bottom: 0; }
+  .navbar-item {
+    position: relative;
+    float: left;
+    margin-bottom: 0; }
+  .navbar-link {
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .2rem;
+    margin-right: 35px;
+    text-decoration: none;
+    line-height: 6.5rem;
+    color: #222; }
+  .navbar-link.active {
+    color: #33C3F0; }
+  .has-docked-nav .navbar {
+    position: fixed;
+    top: 0;
+    left: 0; }
+  .has-docked-nav .navbar-spacer {
+    display: block; }
+  /* Re-overiding the width 100% declaration to match size of % based container */
+  /*
+  .has-docked-nav .navbar > .container {
+    width: 80%; }
+  */
+
+  /* Popover */
+  .popover.open {
+    display: block;
+  }
+  .popover {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    top: 92%;
+    left: -50%;
+    -webkit-filter: drop-shadow(0 0 6px rgba(0,0,0,.1));
+       -moz-filter: drop-shadow(0 0 6px rgba(0,0,0,.1));
+            filter: drop-shadow(0 0 6px rgba(0,0,0,.1)); }
+  .popover-item:first-child .popover-link:after, 
+  .popover-item:first-child .popover-link:before {
+    bottom: 100%;
+    left: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none; }
+  .popover-item:first-child .popover-link:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-bottom-color: #fff;
+    border-width: 10px;
+    margin-left: -10px; }
+  .popover-item:first-child .popover-link:before {
+    border-color: rgba(238, 238, 238, 0);
+    border-bottom-color: #eee;
+    border-width: 11px;
+    margin-left: -11px; }
+  .popover-list {
+    padding: 0;
+    margin: 0;
+    list-style: none; }
+  .popover-item {
+    padding: 0;
+    margin: 0; }
+  .popover-link {
+    position: relative;
+    color: #222;
+    display: block;
+    padding: 8px 20px;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1.0rem;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: .1rem; }
+  .popover-item:first-child .popover-link {
+    border-radius: 4px 4px 0 0; }
+  .popover-item:last-child .popover-link {
+    border-radius: 0 0 4px 4px;
+    border-bottom-width: 0; }
+  .popover-link:hover {
+    color: #fff;
+    background: #33C3F0; }
+  .popover-link:hover,
+  .popover-item:first-child .popover-link:hover:after {
+    border-bottom-color: #33C3F0; }
+}
+
+
+
+
+
+
+
+
+/* dsward - iphone */
+@media screen and (max-width: 550px) {
+  /* Navbar */
+  .navbar + .docs-section {
+    border-top-width: 0; }
+  .navbar,
+  .navbar-spacer {
+    display: block;
+    width: 80%;
+    height: 6.5rem;
+    background: lightgray;
+    z-index: 99; }
+  .navbar-spacer {
+    display: none; }
+  .navbar > .container {
+    width: 100%; }
+  .navbar-list {
+    list-style: none;
+    margin-bottom: 0; }
+  .navbar-item {
+    position: relative;
+    float: left;
+    margin-bottom: 0; }
+  .navbar-link {
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .2rem;
+    margin-right: 35px;
+    text-decoration: none;
+    line-height: 6.5rem;
+    color: #222; }
+  .navbar-link.active {
+    color: #33C3F0; }
+  .has-docked-nav .navbar {
+    position: fixed;
+    top: 0;
+    left: 0; }
+  .has-docked-nav .navbar-spacer {
+    display: block; }
+  /* Re-overiding the width 100% declaration to match size of % based container */
+  .has-docked-nav .navbar > .container {
+    width: 80%; }
+
+  /* Popover */
+  .popover.open {
+    display: block;
+  }
+  .popover {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    top: 92%;
+    left: -50%;
+    -webkit-filter: drop-shadow(0 0 6px rgba(0,0,0,.1));
+       -moz-filter: drop-shadow(0 0 6px rgba(0,0,0,.1));
+            filter: drop-shadow(0 0 6px rgba(0,0,0,.1)); }
+  .popover-item:first-child .popover-link:after, 
+  .popover-item:first-child .popover-link:before {
+    bottom: 100%;
+    left: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none; }
+  .popover-item:first-child .popover-link:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-bottom-color: #fff;
+    border-width: 10px;
+    margin-left: -10px; }
+  .popover-item:first-child .popover-link:before {
+    border-color: rgba(238, 238, 238, 0);
+    border-bottom-color: #eee;
+    border-width: 11px;
+    margin-left: -11px; }
+  .popover-list {
+    padding: 0;
+    margin: 0;
+    list-style: none; }
+  .popover-item {
+    padding: 0;
+    margin: 0; }
+  .popover-link {
+    position: relative;
+    color: #222;
+    display: block;
+    padding: 8px 20px;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1.0rem;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: .1rem; }
+  .popover-item:first-child .popover-link {
+    border-radius: 4px 4px 0 0; }
+  .popover-item:last-child .popover-link {
+    border-radius: 0 0 4px 4px;
+    border-bottom-width: 0; }
+  .popover-link:hover {
+    color: #fff;
+    background: #33C3F0; }
+  .popover-link:hover,
+  .popover-item:first-child .popover-link:hover:after {
+    border-bottom-color: #33C3F0; }
+  svg.localradio_icon {
+      viewbox: 0 0 80 80;
+      width: 80px;
+      height: 80px; }
+}
+
+
+div.tuner-digits {
+    text-align: center;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+span.tuner-digit  {
+    font-family: "Courier";
+    font-size: 40px;
+    border: 1px;
+    border-color: black;
+    border-style: solid;
+    margin: 4px;
+}
+
+span.tuner-digit-pad  {
+    margin-left: 20px;
+}
+
+span.tuner-digit-hidden  {
+    display: none;
+}
+
+span.tuner-text  {
+    font-family: "Courier";
+    font-size: 40px;
+    margin: 4px;
+}
+
+span.tuner-text-pad  {
+    margin-left: 20px;
+}
+
+
+.frequency-button {
+    display: inline;
+    margin: 20px;
+    font-size: 30px;
+}
+
+input.sample-rate-button {
+    display: inline;
+    margin: 3px;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-size: 15px;
+}
+
+/* dsward - iphone se */
+@media screen and (min-width: 320px) {
+  .navbar-link {
+    margin-right: 15px;
+  }
+  a.button.button-primary.two.columns {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* dsward - iphone 6s */
+@media screen and (min-width: 375px) {
+  .navbar-link {
+    margin-right: 25px;
+  }
+  a.button.button-primary.two.columns {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* dsward - iphone 6s plus */
+@media screen and (min-width: 414px) {
+  .navbar-link {
+    margin-right: 30px;
+  }
+  .navbar > .container {
+    width: 80%;
+  }
+  a.button.button-primary.two.columns {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media screen and (min-width: 550px) {
+  /* Navbar */
+  .navbar-link {
+    margin-right: 35px; }
+  .navbar > .container {
+    width: 80%;
+  }
+  a.button.button-primary.two.columns {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+
+html {
+    -webkit-text-size-adjust: none;
+    touch-action: manipulation;
+}
+
+
+/* Custom-task pipeline graphical overview (index above the stage editors).
+   Mirrors the SwiftUI Status view's SVG flow diagram. */
+.ct-pipeline {
+    overflow-x: auto;
+    padding: 4px 2px 8px;
+    margin-bottom: 12px;
+}
+.ct-pipeline .ct-idle {
+    color: var(--ah-muted, #6e6e73);
+    font-style: italic;
+    margin: 6px 2px;
+}
+.ct-pipeline rect.ct-node {
+    fill: var(--ah-node-fill, #f5f9ff);
+    stroke: var(--ah-node-stroke, #0a84ff);
+    stroke-width: 1.5;
+}
+.ct-pipeline g.ct-pnode { cursor: pointer; }
+.ct-pipeline g.ct-pnode:hover rect.ct-node { fill: var(--ah-node-hover, #e6f1ff); }
+.ct-pipeline text.ct-node-index {
+    fill: var(--ah-muted, #6e6e73);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.ct-pipeline text.ct-node-name {
+    fill: var(--ah-fg, #1c1c1e);
+    font-size: 13px;
+    font-weight: 600;
+}
+.ct-pipeline line.ct-arrow { stroke: #8e8e93; stroke-width: 1.5; }
+.ct-pipeline path.ct-arrowhead { fill: #8e8e93; }
+.ct-pipeline text.ct-link-label {
+    fill: var(--ah-muted, #6e6e73);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.ct-back-link {
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    text-decoration: none;
+    margin-bottom: 4px;
+}
+
+/* AAC recorder toggle, shown next to the <audio> element in the bottom bar.
+   flex-shrink:0 keeps it from being squeezed out when the row is tight (see
+   #audiodiv in index.html, which lets the <audio> element shrink instead). */
+.aac-recorder-toggle {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    flex: 0 0 auto;
+}
+.rec-btn {
+    border: none;
+    background: transparent;
+    color: #8e8e93;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+}
+.rec-btn.recording {
+    color: #ff3b30;
+    animation: aac-rec-pulse 1.2s ease-in-out infinite;
+}
+.rec-time {
+    font-family: monospace;
+    font-size: 12px;
+    color: #ff3b30;
+    margin-left: 2px;
+}
+/* Compact file size shown beside each recording's name in the list. */
+.rec-size {
+    color: var(--ah-muted, #6e6e73);
+    font-size: 85%;
+    white-space: nowrap;
+}
+@keyframes aac-rec-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+
+/* ============================================================
+   Colour-scheme theming — Settings page offers Light / Dark /
+   Auto. index.html's <html> carries data-theme="auto|light|dark"
+   (server token %%THEME%%, see AntennaHeadHTTPServer
+   .storedWebUITheme). Every fragment is injected into that page's
+   #content_frame, so theming the shell covers the whole UI.
+
+   `color-scheme` per data-theme drives the CSS `light-dark()`
+   picks below (and the native form-control / scrollbar rendering):
+   "auto" resolves to the OS appearance, "light"/"dark" force it.
+   skeleton.css / normalize.css hardcode light colours; the tokens
+   here are the single place the structural chrome reads.
+   ============================================================ */
+:root                     { color-scheme: light dark; }  /* attr missing → follow OS */
+:root[data-theme="auto"]  { color-scheme: light dark; }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+:root {
+    /* Keep in sync with the `AppBackground` asset-catalog colour and the
+       `--bg` token in StatusWebView's shell — this is the one window
+       background shared by the web tabs and the native SwiftUI tabs. */
+    --ah-bg:          light-dark(#f2f2f7, #1c1c1e);
+    --ah-fg:          light-dark(#222222, #f2f2f7);
+    --ah-muted:       light-dark(#6e6e73, #9e9ea3);
+    --ah-bar-bg:      light-dark(#d3d3d3, #2c2c2e);  /* was the literal `lightgray` */
+    --ah-bar-fg:      light-dark(#222222, #f2f2f7);
+    --ah-border:      light-dark(#d1d1d1, #48484a);
+    --ah-field-bg:    light-dark(#ffffff, #2c2c2e);
+    --ah-field-fg:    light-dark(#333333, #f2f2f7);
+    --ah-panel-bg:    light-dark(#eeeeee, #2c2c2e);
+    --ah-node-fill:   light-dark(#f5f9ff, #25303f);
+    --ah-node-stroke: light-dark(#0a84ff, #409cff);
+    --ah-node-hover:  light-dark(#e6f1ff, #2e3d52);
+    /* .button-primary fill: keep Skeleton's blue in light mode, a muted
+       slate in dark mode (per request). */
+    --ah-primary-bg:         light-dark(#33C3F0, #334950);
+    --ah-primary-bg-hover:   light-dark(#1EAEDB, #3d565e);
+    /* Frequency-tuner digit highlighted for +/- editing (js/antennahead.js
+       tunerDigitClicked). Was an inline literal `lightgray`, which left the
+       light digit text almost unreadable in dark mode. */
+    --ah-digit-selected-bg:  light-dark(#cfcfcf, #4a4a4e);
+}
+
+body {
+    background: var(--ah-bg);
+    color: var(--ah-fg); }
+
+/* Top nav + its links (skeleton hardcodes lightgray / #222). */
+.navbar,
+.navbar-spacer { background: var(--ah-bar-bg); }
+.navbar-link { color: var(--ah-bar-fg); }
+
+/* Form fields (skeleton: #fff bg, #333 text, #D1D1D1 border). */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+    background-color: var(--ah-field-bg);
+    color: var(--ah-field-fg);
+    border-color: var(--ah-border); }
+
+/* Plain buttons only — leave .button-primary's blue fill alone. */
+.button:not(.button-primary),
+button:not(.button-primary),
+input[type="submit"]:not(.button-primary),
+input[type="reset"]:not(.button-primary),
+input[type="button"]:not(.button-primary) {
+    color: var(--ah-fg);
+    border-color: var(--ah-border); }
+
+/* Primary (blue) buttons: light mode unchanged (Skeleton #33C3F0),
+   dark mode uses --ah-primary-bg (#334950). Text stays white. */
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
+    background-color: var(--ah-primary-bg);
+    border-color: var(--ah-primary-bg); }
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="reset"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:focus {
+    background-color: var(--ah-primary-bg-hover);
+    border-color: var(--ah-primary-bg-hover); }
+
+
+/* ============================================================
+   Tap / click acknowledgement.
+
+   index.html's loadContent() replaces #content_frame's innerHTML
+   on the same tick that most buttons are pressed, so the pressed
+   control is gone before a plain :active / transition highlight
+   can paint — which is why a tap can feel like nothing happened
+   until audio starts a couple of seconds later. The delegated
+   pointerdown handler in js/antennahead.js (initTapFeedback)
+   drives the two classes below:
+     .ah-tap-flash  — added to the pressed control; only visible
+                      when it outlives the tap (toggles, tuner
+                      digits, form pages that don't navigate).
+     .ah-tap-ripple — a <span> dropped on <body> at the pointer
+                      point; <body> is never re-rendered, so this
+                      always shows. pointer-events:none so it can
+                      never intercept the real click; it self-
+                      removes on animationend.
+   Opt out via the Settings › Feedback toggle
+   (localStorage["ahTapFeedback"] === "0").
+   ============================================================ */
+@keyframes ah-tap-flash-kf {
+    0%   { filter: brightness(1.4); }
+    100% { filter: brightness(1); }
+}
+.ah-tap-flash {
+    animation: ah-tap-flash-kf 240ms ease-out;
+}
+
+.ah-tap-ripple {
+    position: fixed;
+    z-index: 2147483647;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;   /* centre on the (left,top) point set in JS */
+    border-radius: 50%;
+    pointer-events: none;
+    background: var(--ah-node-stroke, #0a84ff);
+    opacity: 0.45;
+    animation: ah-tap-ripple-kf 340ms ease-out forwards;
+}
+@keyframes ah-tap-ripple-kf {
+    0%   { transform: scale(0.35); opacity: 0.45; }
+    100% { transform: scale(4);    opacity: 0;    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ah-tap-flash  { animation-duration: 120ms; }
+    .ah-tap-ripple { animation: ah-tap-ripple-fade 200ms ease-out forwards; }
+    @keyframes ah-tap-ripple-fade {
+        0%   { transform: scale(1); opacity: 0.4; }
+        100% { transform: scale(1); opacity: 0;   }
+    }
+}
+
+th, td { border-bottom-color: var(--ah-border); }
+code { background: var(--ah-panel-bg); border-color: var(--ah-border); }
+.docs-section { border-top-color: var(--ah-border); }
+.example-grid .column,
+.example-grid .columns { background: var(--ah-panel-bg); }
+.popover { background: var(--ah-bg); border-color: var(--ah-border); }
+.popover-link { color: var(--ah-fg); border-bottom-color: var(--ah-border); }
+
+/* Tuner readout border was a literal `black`. */
+span.tuner-digit { border-color: var(--ah-fg); }
+
+/* The digit picked for +/- editing. tunerDigitClicked() toggles this class
+   (it used to set an inline background-color instead); the token keeps the
+   highlight readable against the light digit text in dark mode. */
+span.tuner-digit.tuner-digit-selected { background-color: var(--ah-digit-selected-bg); }
+
+/* Keyboard focus on a tuner digit (initTunerDigitKeyboard makes each visible
+   digit tabbable): mirror the click highlight and add a ring so Tab / arrow-key
+   users can see which digit they're editing. */
+span.tuner-digit:focus {
+    background-color: var(--ah-digit-selected-bg);
+    outline: 2px solid var(--ah-node-stroke);
+    outline-offset: 1px;
+}
+
+/* Home-screen menu icons (images/*.svg, inlined into index2.html by
+   loadSVG). The files now draw their line-art in `currentColor` and
+   their "paper" fills in `var(--ah-bg)`; this anchors currentColor to
+   the theme foreground regardless of any ancestor `color`. */
+svg.localradio_icon { color: var(--ah-fg); }
+
+/* Info-page illustration (AntennaHead-animation.svg via
+   %%LOCALRADIO_ANIMATION%%): a fixed-palette scene with embedded raster
+   images and black title text — none of it recolourable. Sit it on its
+   own white figure card so it reads correctly in every theme, instead
+   of losing the title and showing a hard white edge mid-drawing. */
+svg.lr-animation {
+    display: block;
+    width: 100%;
+    max-width: 460px;
+    margin: 12px auto;
+    background: #ffffff;
+    border: 1px solid var(--ah-border);
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* ---- Live Captions page (captions.html) -----------------------------------
+   Fed by /captions.json (SDRController.TranscriptionCaptionListener, which
+   consumes the PCMTranscriber tap on UDP 6023). All colours come from the
+   theme tokens so it tracks light/dark like the rest of the UI. */
+.caption-notice {
+    margin: 12px 0;
+    padding: 10px 12px;
+    border: 1px solid var(--ah-border);
+    border-radius: 6px;
+    background: var(--ah-panel-bg);
+    color: var(--ah-fg);
+    font-size: 1.4rem;
+}
+.caption-panel { margin: 12px 0 28px; }
+.caption-transcript {
+    max-height: 55vh;
+    overflow-y: auto;
+    padding: 12px 14px;
+    border: 1px solid var(--ah-border);
+    border-radius: 6px;
+    background: var(--ah-panel-bg);
+    color: var(--ah-fg);
+    font-size: 1.7rem;
+    line-height: 1.5;
+}
+.caption-transcript p { margin: 0 0 0.45em; }
+.caption-transcript p:last-child { margin-bottom: 0; }
+.caption-transcript:empty::before {
+    content: "Waiting for speech\2026";
+    opacity: 0.55;
+}
+.caption-live {
+    margin-top: 10px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    background: var(--ah-bg);
+    color: var(--ah-fg);
+    opacity: 0.7;
+    font-style: italic;
+    font-size: 1.7rem;
+    line-height: 1.5;
+}
+.caption-live:empty { display: none; }

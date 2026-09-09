@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AntennaHead</title>
+<meta name="description" content="AntennaHead: a macOS software-defined-radio player that streams FM/AM/airband/HD Radio to a browser UI on your network.">
+<link rel="icon" type="image/png" href="demo/images/favicon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="dot"></span> AntennaHead</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="antennahead.html">AntennaHead</a>
+      <a href="controlbooth.html">ControlBooth</a>
+      <a href="demo/index.html">Live UI demo</a>
+      <a href="https://github.com/dsward2/AntennaHead">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill">macOS app</span>
+      <h1>AntennaHead</h1>
+      <p class="lede">
+        A macOS app for software-defined-radio streaming. It tunes an RTL-SDR
+        USB device, demodulates the signal, and serves audio plus a full
+        control UI to any browser on your network.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="#demo">Open the interactive UI &rarr;</a>
+        <a class="btn" href="https://github.com/dsward2/AntennaHead">Source &amp; build instructions</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>What it does</h2>
+      <div class="grid">
+        <div class="card"><h3>Tune &amp; demodulate</h3><p>RTL-SDR wide-band FM (mono/stereo), narrow-band FM, AM, airband, and HD Radio, with tuner-gain, sample-rate and squelch controls.</p></div>
+        <div class="card"><h3>Stream anywhere</h3><p>An embedded server (<a href="https://github.com/dsward2/LiveAudioServer">LiveAudioServer</a>) puts out AAC/HLS over HTTP and HTTPS &mdash; listen on a phone, tablet, laptop or smart TV.</p></div>
+        <div class="card"><h3>Favorites &amp; scanning</h3><p>Save stations, group them into categories, and run high-speed scans across a category to stop on activity.</p></div>
+        <div class="card"><h3>Not just the dongle</h3><p>Stream a Core Audio input, bridge Gqrx's UDP output, or speak a folder of text files through the same pipeline.</p></div>
+        <div class="card"><h3>Record</h3><p>Capture the live AAC stream to a file and play recordings back &mdash; or fast-download them &mdash; from the Recordings screen.</p></div>
+        <div class="card"><h3>Spatial audio &amp; filler</h3><p>Per-listener azimuth / distance / reverb, plus an idle "filler" loop with periodic spoken station announcements.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="demo">
+    <div class="wrap">
+      <h2>The web UI, live</h2>
+      <p class="sub">
+        This is the actual front end from
+        <code>AntennaHead/Web/</code>, served here as a static preview: the
+        template tokens and server endpoints are filled by a small mock layer,
+        so navigation, the tuner keypad, category tables and settings all work,
+        but there is no live audio. Anything that needs a real radio shows a
+        short "preview only" note.
+      </p>
+      <div class="demo-layout">
+        <div>
+          <h3 style="margin-top:0">Try these</h3>
+          <ul>
+            <li><b>Radio &rarr; Tuner &rarr; Wide-band FM</b> &mdash; tap the digits, use +/&minus; to change frequency.</li>
+            <li><b>Radio &rarr; Categories</b> &mdash; browse the sample favorite groups.</li>
+            <li><b>Now Playing</b> &mdash; canned status plus the spatial-audio sliders.</li>
+            <li><b>Settings</b> &mdash; AAC bitrate, colour scheme, tap-feedback toggle.</li>
+            <li><b>Audio Devices</b>, <b>Recordings</b>, <b>Info</b>.</li>
+          </ul>
+          <p><a class="btn" href="demo/index.html" target="_blank" rel="noopener">Open the demo full-screen &rarr;</a></p>
+        </div>
+        <div>
+          <div class="phone">
+            <div class="screen">
+              <div class="notch"></div>
+              <iframe src="demo/index.html" title="AntennaHead web UI preview"></iframe>
+            </div>
+          </div>
+          <p class="demo-note">Static preview &middot; no radio connected</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="videos">
+    <div class="wrap">
+      <h2>Screen recordings</h2>
+      <p class="sub">
+        Short captures of the UI driving a live stream in the iOS Simulator.
+        Drop the <code>.mp4</code> files into <code>/videos/</code> using the
+        names below &mdash; see <a href="videos/README.md">videos/README.md</a>
+        for the record + compress recipe. Until then each slot shows a
+        placeholder.
+      </p>
+      <div class="video-grid">
+        <figure class="clip">
+          <video controls playsinline muted preload="metadata" poster="assets/img/poster-listen.png" data-label="Tune &amp; listen">
+            <source src="videos/antennahead-tune-and-listen.mp4" type="video/mp4">
+          </video>
+          <figcaption>Tuning a WBFM station and starting the stream.</figcaption>
+        </figure>
+        <figure class="clip">
+          <video controls playsinline muted preload="metadata" poster="assets/img/poster-scan.png" data-label="Scanner">
+            <source src="videos/antennahead-scanner.mp4" type="video/mp4">
+          </video>
+          <figcaption>High-speed scan across a category.</figcaption>
+        </figure>
+        <figure class="clip">
+          <video controls playsinline muted preload="metadata" poster="assets/img/poster-nowplaying.png" data-label="Now Playing">
+            <source src="videos/antennahead-nowplaying.mp4" type="video/mp4">
+          </video>
+          <figcaption>Now-playing status and spatial-audio controls.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Build it</h2>
+      <p class="sub">Requires macOS 14+, Xcode 15+, and (optionally) an RTL-SDR dongle. Swift Package Manager resolves everything on first build.</p>
+      <p><a class="btn primary" href="https://github.com/dsward2/AntennaHead">github.com/dsward2/AntennaHead &rarr;</a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    &copy; <span data-year>2026</span> David Sward &middot;
+    Built on <a href="https://github.com/dsward2/LocalRadio">LocalRadio</a> &middot;
+    <a href="demo/credits.html">Credits &amp; licenses</a>
+  </div>
+</footer>
+
+<script src="assets/js/nav.js"></script>
+</body>
+</html>
