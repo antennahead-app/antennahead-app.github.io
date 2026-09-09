@@ -326,7 +326,7 @@
     if (!bar || !frame) return;
     var r = document.createElement("div");
     r.id = "preview-ribbon";
-    r.textContent = "Interactive preview — no radio connected. github.com/dsward2/AntennaHead";
+    r.textContent = "Interactive preview — no radio connected";
     bar.parentNode.insertBefore(r, frame);
   }
 
