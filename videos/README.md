@@ -17,6 +17,15 @@ the site first and add clips later.
 Names are matched literally in `antennahead.html` / `controlbooth.html`. To use
 different names or add more, edit the `<source src="...">` lines there.
 
+## Keeping the original take
+
+`videos/source/` (gitignored) holds the full-length, 1x-speed, high-quality
+master for each clip that's been sped up for the site — e.g.
+`antennahead-tune-and-listen-master.mp4` next to the sped-up
+`antennahead-tune-and-listen.mp4` above. Keep the master around if you might
+want to re-cut or re-speed a clip later; it isn't a web asset and doesn't get
+committed.
+
 ## Recording the iOS Simulator
 
 Boot a simulator and run the AntennaHead web app in Safari inside it, then:

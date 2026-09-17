@@ -1,3 +1,5 @@
 .DS_Store
 *.mov
 scripts/*.tmp
+# Full-quality, unsped raw takes kept for further editing -- not web assets.
+videos/source/
