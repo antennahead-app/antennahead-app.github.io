@@ -10,7 +10,7 @@ the site first and add clips later.
 |---|---|---|---|
 | `antennahead-tune-and-listen.mp4` | antennahead.html | portrait 9:16 | 15–30 s |
 | `antennahead-scanner.mp4`         | antennahead.html | portrait 9:16 | 15–30 s |
-| `antennahead-nowplaying.mp4`      | antennahead.html | portrait 9:16 | 10–20 s |
+| `antennahead-tuner-wbfm.mp4`      | antennahead.html | portrait 9:16 | 15–30 s |
 | `controlbooth-build-pipeline.mp4` | controlbooth.html | landscape 16:9 | 20–40 s |
 | `controlbooth-structured-args.mp4`| controlbooth.html | landscape 16:9 | 15–30 s |
 
