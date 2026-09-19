@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What's an RTL-SDR? &mdash; AntennaHead</title>
+<meta name="description" content="What an RTL-SDR USB dongle is, how it lets AntennaHead receive radio, and which dongle we recommend if you don't have one yet.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='.9em' font-size='58'%3E📡%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="mark" aria-hidden="true">📡💀</span> AntennaHead</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="antennahead.html">AntennaHead</a>
+      <a href="controlbooth.html">ControlBooth</a>
+      <a href="rtl-sdr.html">RTL-SDR?</a>
+      <a href="demo/index.html">Live UI demo</a>
+      <a href="https://github.com/dsward2/AntennaHead">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill">New to SDR?</span>
+      <h1>What's an RTL-SDR dongle?</h1>
+      <p class="lede">
+        AntennaHead needs one small piece of hardware to actually receive
+        radio: a USB stick called an RTL-SDR dongle. Here's what it is, what
+        it looks like, and which one to buy if you don't have one yet.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="https://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/">Get the RTL-SDR Blog V3 &rarr;</a>
+        <a class="btn" href="antennahead.html">Back to AntennaHead</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>A repurposed TV tuner</h2>
+      <p class="sub">
+        RTL-SDR dongles started life as cheap USB TV tuner sticks for
+        watching over-the-air digital TV on a PC. In 2010, hobbyists found
+        that the tuner chip inside &mdash; the Realtek RTL2832U &mdash; could
+        be told to dump its raw radio samples straight over USB instead of
+        decoding TV with them. That turned a $10&ndash;$30 TV stick into a
+        general-purpose <b>software-defined radio</b> (SDR) receiver.
+      </p>
+      <div class="grid">
+        <div class="card"><h3>Receive-only</h3><p>It digitizes a slice of radio spectrum and hands the raw samples to software over USB &mdash; it doesn't transmit anything.</p></div>
+        <div class="card"><h3>All the tuning is software</h3><p>The dongle itself does no demodulation. AntennaHead does the actual FM/AM/airband math on the samples it streams in.</p></div>
+        <div class="card"><h3>Wide coverage</h3><p>Roughly 500&nbsp;kHz&ndash;1.7&nbsp;GHz depending on the model &mdash; FM &amp; AM broadcast, airband, NOAA weather radio, ham bands, and more.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>What it looks like</h2>
+      <p class="sub">
+        Physically it's about the size of a USB flash drive, with a coax
+        antenna connector on one end. It plugs directly into a USB port (a
+        short extension cable helps keep it away from other electronics),
+        with an antenna attached to the connector.
+      </p>
+      <figure class="dongle-fig">
+        <svg viewBox="0 0 320 160" role="img" aria-labelledby="dongleTitle">
+          <title id="dongleTitle">Illustration of a USB RTL-SDR dongle with an antenna</title>
+          <rect x="18" y="58" width="26" height="16" rx="2" fill="var(--fg-3)"/>
+          <rect x="10" y="54" width="14" height="24" rx="2" fill="var(--fg-3)"/>
+          <rect x="40" y="46" width="150" height="40" rx="8" fill="var(--bg-3)" stroke="var(--border)" stroke-width="2"/>
+          <circle cx="168" cy="66" r="3.5" fill="var(--radio)"/>
+          <rect x="184" y="60" width="16" height="12" rx="2" fill="var(--fg-3)"/>
+          <line x1="200" y1="66" x2="236" y2="30" stroke="var(--fg-2)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="236" y1="30" x2="236" y2="16" stroke="var(--fg-2)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="236" cy="12" r="4" fill="var(--radio)"/>
+        </svg>
+        <figcaption>
+          Illustration, not a specific product photo &mdash; body, USB plug,
+          antenna connector and a whip antenna. See the RTL-SDR Blog link
+          below for real photos of the recommended device.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Which one to get</h2>
+      <p class="sub">
+        Generic RTL2832U TV-tuner sticks are still sold everywhere for a few
+        dollars, but quality varies a lot: cheap crystals drift off-frequency,
+        and there's little protection against static or strong nearby
+        signals overloading the front end. We recommend a dongle actually
+        designed for SDR use instead of a repurposed TV tuner.
+      </p>
+      <div class="grid">
+        <div class="card"><h3>RTL-SDR Blog V3</h3><p>The dongle most SDR software &mdash; AntennaHead included &mdash; is built and tested against. Temperature-compensated crystal oscillator (TCXO) for a stable, accurate frequency lock, better ESD/static protection, an aluminum case for shielding, extended range down into HF, and a bias-tee for powering an external LNA.</p></div>
+        <div class="card"><h3>What's in the box</h3><p>It ships with a small telescopic whip antenna and SMA/MCX adapters &mdash; enough to get FM broadcast and airband working right away. A dipole or discone antenna later improves range on weaker signals.</p></div>
+      </div>
+      <p class="sub" style="margin-top:1.6em">
+        <a class="btn primary" href="https://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/">Buy the RTL-SDR Blog V3 (rtl-sdr.com) &rarr;</a>
+      </p>
+      <p class="sub">
+        Once you have one, plug it into a USB port on your Mac and see the
+        <a href="antennahead.html">AntennaHead page</a> for a tour of the
+        tuner, favorites and scanner UI.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    &copy; <span data-year>2026</span> Douglas S. Ward &middot;
+    Built on <a href="https://github.com/dsward2/LocalRadio">LocalRadio</a> &middot;
+    <a href="demo/credits.html">Credits &amp; licenses</a>
+  </div>
+</footer>
+
+<script src="assets/js/nav.js"></script>
+</body>
+</html>

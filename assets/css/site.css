@@ -171,6 +171,14 @@ figure.clip .missing {
   background: repeating-linear-gradient(45deg, var(--bg-3), var(--bg-3) 10px, var(--bg-2) 10px, var(--bg-2) 20px);
 }
 
+/* ---- dongle illustration ---- */
+.dongle-fig {
+  margin: 0; background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; max-width: 420px;
+}
+.dongle-fig svg { display: block; width: 100%; height: auto; }
+.dongle-fig figcaption { padding-top: 14px; font-size: .88rem; color: var(--fg-3); }
+
 /* ---- ecosystem list ---- */
 .repos { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .repo { display: block; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
