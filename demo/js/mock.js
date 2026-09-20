@@ -166,7 +166,7 @@
   }
 
   var CONTROLBOOTH_TILE =
-    '<div class="six columns value-prop">' + icon("redphone") +
+    '<div class="six columns value-prop">' + icon("controlbooth") +
     '<div class="value-prop"><a class="button button-primary" ' +
     'onclick="window.__ahPreviewToast(\'Preview only — pair with ControlBooth in the app\')">' +
     "ControlBooth</a></div>Receive a live mix pushed from ControlBooth.</div>";
