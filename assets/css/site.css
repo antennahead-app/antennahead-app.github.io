@@ -197,13 +197,18 @@ hr.soft { border: 0; border-top: 1px solid var(--border); margin: 40px 0; }
         border-radius: 999px; padding: 2px 10px; }
 
 /* ---- system animation ----
-   The SVG is black line art on a white rect. In dark mode we invert it (hue-rotate keeps
-   the blue dashed links blue) and blend with `screen` so its now-black background
-   disappears into the card. */
+   Light: the plain SVG. Dark: a second file, AntennaHead-animation-dark.svg, whose five
+   embedded photos carry their own invert(1) hue-rotate(180deg). The <img> then gets the same
+   filter, so the line art flips to white while the photos are inverted twice (= original
+   colors). `screen` blending makes the inverted black background vanish into the card.
+   The dark <img> is loading="lazy", so it is only fetched while it is displayed. */
 figure.concept { margin: 0; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 figure.concept img { display: block; width: 100%; height: auto; }
+figure.concept .concept-dark { display: none; }
 figure.concept figcaption { padding: 12px 18px 16px; font-size: .88rem; color: var(--fg-3); }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) figure.concept img { filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
+  :root:not([data-theme="light"]) figure.concept .concept-light { display: none; }
+  :root:not([data-theme="light"]) figure.concept .concept-dark  { display: block; filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
 }
-:root[data-theme="dark"] figure.concept img { filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
+:root[data-theme="dark"] figure.concept .concept-light { display: none; }
+:root[data-theme="dark"] figure.concept .concept-dark  { display: block; filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
