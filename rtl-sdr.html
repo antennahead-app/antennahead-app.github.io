@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What's an RTL-SDR USB dongle?</title>
-<meta name="description" content="What an RTL-SDR USB dongle is, how it lets AntennaHead receive radio, and which dongle we recommend if you don't have one yet.">
+<title>What's an RTL-SDR USB radio?</title>
+<meta name="description" content="What an RTL-SDR USB radio is, how it lets AntennaHead receive radio, and which one we recommend if you don't have one yet.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='.9em' font-size='58'%3E📡%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/css/site.css">
 </head>
@@ -28,10 +28,10 @@
   <section class="hero">
     <div class="wrap">
       <span class="pill">New to SDR?</span>
-      <h1>What's an RTL-SDR USB dongle?</h1>
+      <h1>What's an RTL-SDR USB radio?</h1>
       <p class="lede">
         AntennaHead needs one small piece of hardware to actually receive
-        radio: a USB stick called an RTL-SDR dongle. Here's what it is, what
+        radio: a USB stick called an RTL-SDR radio. Here's what it is, what
         it looks like, and which one to buy if you don't have one yet.
       </p>
       <div class="cta-row">
@@ -45,7 +45,7 @@
     <div class="wrap">
       <h2>A repurposed TV tuner</h2>
       <p class="sub">
-        RTL-SDR dongles started life as cheap USB TV tuner sticks for
+        RTL-SDR radio dongles started life as cheap USB TV tuner sticks for
         watching over-the-air digital TV on a PC. In 2010, hobbyists found
         that the tuner chip inside &mdash; the Realtek RTL2832U &mdash; could
         be told to dump its raw radio samples straight over USB instead of
@@ -54,7 +54,7 @@
       </p>
       <div class="grid">
         <div class="card"><h3>Receive-only</h3><p>It digitizes a slice of radio spectrum and hands the raw samples to software over USB &mdash; it doesn't transmit anything.</p></div>
-        <div class="card"><h3>All the tuning is software</h3><p>The dongle itself does no demodulation. AntennaHead does the actual FM/AM/airband math on the samples it streams in.</p></div>
+        <div class="card"><h3>All the tuning is software</h3><p>The RTL-SDR itself does no demodulation. AntennaHead does the actual FM/AM/airband math on the samples it streams in.</p></div>
         <div class="card"><h3>Wide coverage</h3><p>Roughly 500&nbsp;kHz&ndash;1.7&nbsp;GHz depending on the model &mdash; FM &amp; AM broadcast, airband, NOAA weather radio, ham bands, and more.</p></div>
       </div>
     </div>
@@ -71,7 +71,7 @@
         from other electronics), with an antenna attached to the connector.
       </p>
       <figure class="dongle-fig photo">
-        <img src="assets/img/rtl-sdr-blog-v3.jpg" width="1200" height="522" alt="The RTL-SDR Blog V3 dongle: a black aluminum USB stick with a gold SMA antenna connector at one end and a USB-A plug at the other">
+        <img src="assets/img/rtl-sdr-blog-v3.jpg" width="1200" height="522" alt="The RTL-SDR Blog V3 USB radio: a black aluminum USB stick with a gold SMA antenna connector at one end and a USB-A plug at the other">
         <figcaption>The RTL-SDR Blog V3.</figcaption>
       </figure>
       <p class="note">
@@ -88,11 +88,11 @@
         Generic RTL2832U TV-tuner sticks are still sold everywhere for a few
         dollars, but quality varies a lot: cheap crystals drift off-frequency,
         and there's little protection against static or strong nearby
-        signals overloading the front end. We recommend a dongle actually
+        signals overloading the front end. We recommend a radio actually
         designed for SDR use instead of a repurposed TV tuner.
       </p>
       <div class="grid">
-        <div class="card"><h3>RTL-SDR Blog V3</h3><p>The dongle most SDR software &mdash; AntennaHead included &mdash; is built and tested against. Temperature-compensated crystal oscillator (TCXO) for a stable, accurate frequency lock, better ESD/static protection, an aluminum case for shielding, extended range down into HF, and a bias-tee for powering an external LNA.</p></div>
+        <div class="card"><h3>RTL-SDR Blog V3</h3><p>The radio most SDR software &mdash; AntennaHead included &mdash; is built and tested against. Temperature-compensated crystal oscillator (TCXO) for a stable, accurate frequency lock, better ESD/static protection, an aluminum case for shielding, extended range down into HF, and a bias-tee for powering an external LNA.</p></div>
         <div class="card"><h3>What's in the box</h3><p>It ships with a small telescopic whip antenna and SMA/MCX adapters &mdash; enough to get FM broadcast and airband working right away. A dipole or discone antenna later improves range on weaker signals.</p></div>
       </div>
       <p class="note">
