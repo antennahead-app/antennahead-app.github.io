@@ -153,6 +153,14 @@
     'onclick="window.__ahPreviewToast(\'Preview only — pair with ControlBooth in the app\')">' +
     "ControlBooth</a></div>Receive a live mix pushed from ControlBooth.</div>";
 
+  // "Listen to Gqrx" tile on the Radio page (the real app injects it when Gqrx
+  // integration is enabled in Configuration).
+  var GQRX_TILE =
+    '<div class="six columns value-prop">' + icon("gqrx") +
+    '<div class="value-prop"><a class="button button-primary" ' +
+    'onclick="loadContent(\'devicegqrx.html\');">Listen to Gqrx</a></div>' +
+    "Receive Gqrx's UDP audio output<br>and stream it here</div>";
+
   // token -> replacement string (or function(name) -> string)
   var TOKENS = {
     THEME: "light",
@@ -170,6 +178,7 @@
     TEXT_TO_SPEECH_ICON: icon("texttospeech"),
     LOCALRADIO_ANIMATION: icon("AntennaHead-animation"),
     CONTROLBOOTH_TILE: CONTROLBOOTH_TILE,
+    GQRX_TILE: GQRX_TILE,
 
     CATEGORIES_TABLE: CATEGORIES_TABLE,
     CATEGORY_TABLE: CATEGORIES_TABLE,
