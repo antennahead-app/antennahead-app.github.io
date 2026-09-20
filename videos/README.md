@@ -8,7 +8,7 @@ the site first and add clips later.
 
 | File | Page | Orientation | Suggested length |
 |---|---|---|---|
-| `antennahead-tune-and-listen.mp4` | antennahead.html | portrait 9:16 | 15–30 s |
+| `antennahead-audio-delay.mp4`     | antennahead.html | portrait 9:16 | 15–30 s |
 | `antennahead-scanner.mp4`         | antennahead.html | portrait 9:16 | 15–30 s |
 | `antennahead-tuner-wbfm.mp4`      | antennahead.html | portrait 9:16 | 15–30 s |
 | `controlbooth-build-pipeline.mp4` | controlbooth.html | landscape 16:9 | 20–40 s |
@@ -21,8 +21,8 @@ different names or add more, edit the `<source src="...">` lines there.
 
 `videos/source/` (gitignored) holds the full-length, 1x-speed, high-quality
 master for each clip that's been sped up for the site — e.g.
-`antennahead-tune-and-listen-master.mp4` next to the sped-up
-`antennahead-tune-and-listen.mp4` above. Keep the master around if you might
+`antennahead-audio-delay-master.mp4` next to the sped-up
+`antennahead-audio-delay.mp4` above. Keep the master around if you might
 want to re-cut or re-speed a clip later; it isn't a web asset and doesn't get
 committed.
 
