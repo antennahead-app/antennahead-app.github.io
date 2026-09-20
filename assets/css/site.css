@@ -195,3 +195,15 @@ hr.soft { border: 0; border-top: 1px solid var(--border); margin: 40px 0; }
 .pill { display:inline-block; font-size:.75rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
         color: var(--radio); border:1px solid color-mix(in srgb, var(--radio) 40%, var(--border));
         border-radius: 999px; padding: 2px 10px; }
+
+/* ---- system animation ----
+   The SVG is black line art on a white rect. In dark mode we invert it (hue-rotate keeps
+   the blue dashed links blue) and blend with `screen` so its now-black background
+   disappears into the card. */
+figure.concept { margin: 0; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+figure.concept img { display: block; width: 100%; height: auto; }
+figure.concept figcaption { padding: 12px 18px 16px; font-size: .88rem; color: var(--fg-3); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) figure.concept img { filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
+}
+:root[data-theme="dark"] figure.concept img { filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
