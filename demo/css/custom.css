@@ -698,17 +698,37 @@ html {
     vertical-align: middle;
     flex: 0 0 auto;
 }
+/* The record dot is drawn with CSS rather than rendering the literal ⏺
+   (U+23FA) glyph: symbol-glyph metrics differ between WebKit and Blink and
+   left the character optically high against the native <audio> controls
+   next to it. A flex-centred pseudo-element sits on the true geometric
+   centre of the button box on every engine. 28px box == the old 20px
+   font + 2*4px padding, so the bottom-bar layout is unchanged. */
 .rec-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin: 0;               /* Skeleton gives <button> a 10px bottom margin */
+    padding: 0;
     border: none;
     background: transparent;
-    color: #8e8e93;
-    font-size: 20px;
+    font-size: 0;            /* suppress the literal ⏺ text node */
     line-height: 1;
     cursor: pointer;
-    padding: 4px;
+}
+.rec-btn::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #8e8e93;
+}
+.rec-btn.recording::before {
+    background: #ff3b30;
 }
 .rec-btn.recording {
-    color: #ff3b30;
     animation: aac-rec-pulse 1.2s ease-in-out infinite;
 }
 .rec-time {
@@ -723,6 +743,30 @@ html {
     font-size: 85%;
     white-space: nowrap;
 }
+/* Scrolling wrapper around a file-listing table — Recordings' recordings
+   list and Text to Speech's read-only .txt listing both use this so a long
+   folder doesn't push the rest of the page's controls off screen. */
+.scrolling-file-list {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--ah-border);
+    border-radius: 6px;
+    margin: 6px 0 12px;
+}
+.scrolling-file-list table { margin-bottom: 0; }
+.scrolling-file-list thead th {
+    position: sticky;
+    top: 0;
+    background: var(--ah-bg);
+    z-index: 1;
+}
+/* Select All / Select None row above the Text to Speech file list. */
+.tts-select-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.tts-select-actions .button { margin-bottom: 0; }
 @keyframes aac-rec-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.35; }
@@ -974,3 +1018,70 @@ svg.lr-animation {
     line-height: 1.5;
 }
 .caption-live:empty { display: none; }
+
+/* ── "Listen to Gqrx" remote-control panel ─────────────────────────────────
+   Rendered by gqrxControlPanelHTML(); revealed + driven by the gqrx* fns in
+   antennahead.js. Uses the shared --ah-* theme tokens defined above.        */
+.gqrx-panel { margin-top: 4px; text-align: left; }
+.gqrx-panel hr { margin: 18px 0 12px; border-color: var(--ah-border); }
+.gqrx-status {
+    font-size: 1.4rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--ah-panel-bg);
+    color: var(--ah-muted);
+}
+.gqrx-status.ok  { color: light-dark(#1a7f37, #4ac26b); }
+.gqrx-status.bad { color: light-dark(#b3261e, #ff7b72); }
+.gqrx-row { margin-bottom: 14px; }
+.gqrx-row > label {
+    display: block;
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+    color: var(--ah-fg);
+}
+.gqrx-val { color: var(--ah-muted); font-weight: 600; }
+.gqrx-inline { display: flex; gap: 8px; }
+.gqrx-inline .gqrx-freq { flex: 1; margin-bottom: 0; }
+.gqrx-inline .button { margin-bottom: 0; }
+.gqrx-panel input[type="range"] { width: 100%; }
+.gqrx-panel select,
+.gqrx-panel input[type="number"],
+.gqrx-panel input[type="text"] {
+    background: var(--ah-field-bg);
+    color: var(--ah-field-fg);
+    border: 1px solid var(--ah-border);
+}
+.gqrx-check { font-size: 1.4rem; color: var(--ah-fg); }
+.gqrx-check input { margin-right: 8px; }
+.gqrx-meter {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--ah-bar-bg);
+    overflow: hidden;
+}
+.gqrx-meter-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--ah-node-stroke);
+    transition: width 0.25s ease;
+}
+.gqrx-bookmarks {
+    max-height: 240px;
+    overflow-y: auto;
+    border: 1px solid var(--ah-border);
+    border-radius: 6px;
+    margin-top: 6px;
+}
+.gqrx-bm {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--ah-border);
+    font-size: 1.35rem;
+}
+.gqrx-bm:last-child { border-bottom: none; }
+.gqrx-bm-name { color: var(--ah-fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gqrx-bm-btn { margin-bottom: 0; padding: 0 14px; height: 30px; line-height: 30px; }

@@ -37,11 +37,20 @@ for f in index.html index2.html js/mock.js; do
   fi
 done
 
+# DEMO.md is hand-written documentation that lives only in demo/; keep it across the re-copy.
+keep_doc=""
+if [[ -f "$here/demo/DEMO.md" ]]; then
+  keep_doc="$(mktemp)"; cp "$here/demo/DEMO.md" "$keep_doc"
+fi
+
 echo "Copying $web -> $here/demo"
 rm -rf "$here/demo"
 mkdir -p "$here/demo"
 cp -R "$web/." "$here/demo/"
-rm -f "$here/demo/default.profraw"
+# Upstream scratch/junk files that must not be published.
+rm -f "$here/demo/default.profraw" "$here/demo/index.html.original"
+find "$here/demo" -name .DS_Store -delete
+if [[ -n "$keep_doc" ]]; then mv "$keep_doc" "$here/demo/DEMO.md"; fi
 
 echo "Restoring pre-rendered overrides"
 for f in index.html index2.html js/mock.js; do

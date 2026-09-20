@@ -117,6 +117,24 @@
     slider("Reverb", "spatial_reverb", 0, 100, 12, "%") +
     "</div>";
 
+  // Audio-delay controls on the Now Playing page (the real app shows them when the
+  // delay is switched on in Configuration). Markup mirrors audioDelayControlsHTML()
+  // in AntennaHeadHTTPServer.swift: max 600 s, ~7 s built-in HLS latency.
+  var AUDIO_DELAY_CONTROLS =
+    '<div id="audio-delay-controls" style="margin-top: 24px;">' +
+    "<h4>Audio Delay</h4>" +
+    '<label for="audio-delay">Extra delay: <span id="audio-delay-value">0:00</span></label>' +
+    '<label id="audio-delay-latency" data-builtin="7">Estimated total from live: <span id="audio-delay-total">0:07</span></label><br>' +
+    '<input type="range" id="audio-delay" min="0" max="600" step="1" value="0" style="width: 100%;" ' +
+    'oninput="audioDelaySliderChanged(false)" onchange="audioDelaySliderChanged(true)">' +
+    '<div style="margin-top: 8px;">' +
+    '<input class="button" type="button" value="Delay 1 Second" onclick="audioDelayAdjust(1)"> ' +
+    '<input class="button" type="button" value="Skip 1 Second" onclick="audioDelayAdjust(-1)"></div>' +
+    '<p style="margin-top: 8px; font-size: 0.85em;">The streaming server itself adds about 7 s to the HLS stream ' +
+    "(about 0.1 s for the MP3 and AAC streams), before any buffering in your player.</p>" +
+    '<p style="margin-top: 8px; font-size: 0.85em;">A short chirp is mixed into the audio when each change takes effect. ' +
+    "Raising the delay pauses briefly; lowering it skips ahead.</p></div>";
+
   var AAC_BITRATE_SELECT = [32, 48, 64, 96, 128, 160, 192, 256, 320]
     .map(function (k) {
       return '<option value="' + k * 1000 + '"' + (k === 128 ? " selected" : "") +
@@ -191,6 +209,7 @@
     NOW_PLAYING_DETAILS: NOW_PLAYING_DETAILS,
     NOW_PLAYING_STATUS_RESULT: "",
     SPATIAL_AUDIO_CONTROLS: SPATIAL_AUDIO_CONTROLS,
+    AUDIO_DELAY_CONTROLS: AUDIO_DELAY_CONTROLS,
     OPEN_AUDIO_PLAYER_PAGE_BUTTON: "",
 
     AAC_BITRATE_SELECT: AAC_BITRATE_SELECT,
@@ -253,7 +272,9 @@
   var RealOpen = XMLHttpRequest.prototype.open;
   var RealSend = XMLHttpRequest.prototype.send;
 
-  function mockFor(method, url) {
+  var audioDelay = 0; // seconds; state for the mocked /api/audio-delay/update
+
+  function mockFor(method, url, body) {
     var u = String(url);
     method = String(method || "GET").toUpperCase();
 
@@ -264,6 +285,14 @@
     if (/api\/v1\/controlbooth\/status$/.test(u)) return { body: JSON.stringify({ running: false }) };
     if (/captions\.json$/.test(u)) return { body: JSON.stringify({ seq: 0, lines: [] }) };
     if (/api\/spatial-audio\/update$/.test(u)) return { body: "{}" };
+    if (/api\/audio-delay\/update$/.test(u)) {
+      var req = {};
+      try { req = JSON.parse(body || "{}"); } catch (e) {}
+      if (typeof req.adjust === "number") audioDelay += req.adjust;
+      else if (typeof req.seconds === "number") audioDelay = req.seconds;
+      audioDelay = Math.max(0, Math.min(600, audioDelay));
+      return { body: JSON.stringify({ seconds: audioDelay }) };
+    }
 
     if (method === "POST" && /(listenbuttonclicked|insertnewfrequency|storefrequency|deletefrequency|storecategory|addcategory|deletecategory|applyaacsettings|applywebuitheme|texttospeechchoosefolder)\.html$/.test(u)) {
       return { body: "", toast: "Preview only — this action needs the AntennaHead app" };
@@ -278,7 +307,7 @@
   };
 
   XMLHttpRequest.prototype.send = function (body) {
-    var m = mockFor(this.__m, this.__u);
+    var m = mockFor(this.__m, this.__u, body);
     if (!m) return RealSend.apply(this, arguments);
 
     var xhr = this;
