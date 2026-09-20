@@ -178,6 +178,12 @@ figure.clip .missing {
 }
 .dongle-fig svg { display: block; width: 100%; height: auto; }
 .dongle-fig figcaption { padding-top: 14px; font-size: .88rem; color: var(--fg-3); }
+/* photo variant: the product shot has a white background, so keep it on a white mat in dark mode too */
+.dongle-fig.photo { background: #fff; padding: 0; max-width: 640px; overflow: hidden; }
+.dongle-fig.photo img { display: block; width: 100%; height: auto; }
+.dongle-fig.photo figcaption { padding: 0 16px 12px; color: #6b6b70; }
+.note { margin: 20px 0 0; max-width: 640px; padding: 12px 16px; border: 1px solid var(--border);
+        border-left: 4px solid var(--radio); border-radius: 8px; background: var(--bg-2); font-size: .95rem; }
 
 /* ---- ecosystem list ---- */
 .repos { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
