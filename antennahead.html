@@ -134,6 +134,19 @@
     </div>
   </section>
 
+  <section class="band" id="https">
+    <div class="wrap">
+      <h2>Using HTTPS</h2>
+      <p class="sub">Plain HTTP is fine on a home network, and it's the default. If you want the connection encrypted, for example when you turn on AntennaHead's web login, turn on HTTPS in AntennaHead's <strong>Security</strong> tab. AntennaHead then also listens for HTTPS, on port <code>8094</code> unless you change it in Configuration.</p>
+      <div class="grid">
+        <div class="card"><h3>In a web browser</h3><p>AntennaHead can generate its own self-signed certificate (Security &rsaquo; Load / Generate Self-Signed Certificate). Browsers warn about a self-signed certificate the first time, and usually let you continue to the page.</p></div>
+        <div class="card"><h3>In the iPhone, Apple Watch and Apple TV apps</h3><p>The native apps (<a href="https://github.com/dsward2/AntennaHeadiOS">iPhone &amp; Apple Watch</a>, <a href="https://github.com/dsward2/AntennaHeadTV">Apple TV</a>) only accept a certificate the device already trusts, so the self-signed one won't work. Use a certificate from a trusted authority, such as Let's Encrypt or Tailscale, and load it as a <strong>User-Supplied Certificate</strong> (<code>.p12</code>) in the Security tab.</p></div>
+        <div class="card"><h3>Connect by name</h3><p>Enter the name on the certificate and the HTTPS port, e.g. <code>mac.example.com:8094</code>, not the Mac's IP address. The name has to reach the Mac wherever you listen: at home, and over your VPN if you use one. A <code>.local</code> name only works on your home network.</p></div>
+        <div class="card"><h3>Turn it on in each app</h3><p>iPhone: <strong>Use HTTPS</strong> in the server's settings. Apple Watch: it takes the iPhone's setting, or use the <strong>HTTPS</strong> switch when adding a server on the Watch. Apple TV: <strong>Use HTTPS</strong> on the connect screen. If a device doesn't trust the certificate, the apps won't connect: the Apple TV app says the certificate isn't trusted, and the iPhone app says it can't reach the server.</p></div>
+      </div>
+    </div>
+  </section>
+
   <section class="band">
     <div class="wrap">
       <h2>Build it</h2>
