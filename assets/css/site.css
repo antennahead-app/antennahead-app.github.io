@@ -75,9 +75,7 @@ a:hover { text-decoration: underline; }
   display: flex; align-items: center; gap: 9px;
 }
 .brand .mark {
-  font-size: 15px; line-height: 1;
-  /* keep the emoji glyphs tight together */
-  letter-spacing: -0.12em; padding-right: 0.12em;
+  width: 24px; height: 24px; display: block; flex: none;
 }
 .site-nav { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
 .site-nav a {
@@ -89,9 +87,8 @@ a:hover { text-decoration: underline; }
 /* ---- hero ---- */
 .hero { padding: 76px 0 44px; }
 .hero .hero-mark {
-  font-size: clamp(2.4rem, 6vw, 3.6rem); line-height: 1;
-  letter-spacing: -0.08em; margin-bottom: .35em;
-  filter: saturate(1.05);
+  display: block; width: clamp(64px, 9vw, 88px); height: auto;
+  margin-bottom: .6em;
 }
 .hero h1 {
   font-size: clamp(2rem, 4vw + 1rem, 3.3rem);
