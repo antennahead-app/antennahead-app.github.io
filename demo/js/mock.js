@@ -451,6 +451,23 @@
         });
       }
     });
+    // Tile icons are <embed>ed SVG files here (the app inlines them), so an
+    // icon's own onclick runs inside the embedded document, where there's no
+    // loadContent(). Let clicks fall through the embed to a wrapper that
+    // presses the tile's button instead, like clicking the icon in the app.
+    Array.prototype.forEach.call(root.querySelectorAll("embed.value-img"), function (embed) {
+      var button = embed.parentNode && embed.parentNode.querySelector("a.button");
+      if (!button || embed.parentNode.classList.contains("ah-icon-link")) return;
+      var link = document.createElement("span");
+      link.className = "ah-icon-link";
+      link.setAttribute("role", "button");
+      link.setAttribute("aria-label", button.textContent.trim());
+      link.style.cssText = "display:inline-block;cursor:pointer";
+      embed.style.pointerEvents = "none";
+      embed.parentNode.insertBefore(link, embed);
+      link.appendChild(embed);
+      link.addEventListener("click", function () { button.click(); });
+    });
   };
 
   /* ---------- 5. preview ribbon + toast ------------------------------- */
