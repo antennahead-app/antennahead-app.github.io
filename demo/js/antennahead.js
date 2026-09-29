@@ -788,6 +788,45 @@ function initTunerDigitKeyboard()
 
 
 
+// Called by every Listen button handler the moment it is clicked: relabels the
+// top frame's "Now Playing: ..." tab button as "Up Next: <title>" so the user
+// sees what they just asked for while the tuner/stream is still switching.
+// periodicUpdate() puts "Now Playing: ..." back once the server reports the
+// new station. With no argument the title is read from the page's
+// #listen_title heading.
+function showUpNextInNavBar(title)
+{
+  try {
+    var navBarLink = window.top.document.getElementById("nowPlayingNavBarLink");
+    if (navBarLink == null) { return; }
+
+    if (title === undefined || title === null)
+    {
+      var titleElement = window.document.getElementById("listen_title");
+      title = (titleElement != null) ? titleElement.innerText : "";
+    }
+
+    title = String(title).trim();
+    if (title === "") { return; }
+
+    navBarLink.innerText = "UP NEXT: " + title;
+  }
+  catch (err) {
+    // ignore: the tab label is cosmetic
+  }
+}
+
+
+// Formats a tuner frequency in Hz (digits, possibly zero-padded) for the
+// "Up Next" label, e.g. "0089100000" -> "89.1 MHz". Falls back to the raw text.
+function upNextFrequencyTitle(frequency)
+{
+  var hertz = parseInt(frequency, 10);
+  if (isNaN(hertz) || hertz <= 0) { return String(frequency); }
+  return (hertz / 1000000).toString() + " MHz";
+}
+
+
 function listenButtonClicked(form)
 {
   //console.log("listenButtonClicked");
@@ -811,6 +850,8 @@ function listenButtonClicked(form)
   xhttp.send(jsonData);
 
   // handle the audio tag with the new source
+  showUpNextInNavBar();
+
   window.top.postMessage("startaudio", "*");
 
   //console.log("postMessage startaudio");
@@ -927,6 +968,8 @@ function frequencyListenButtonClicked()
     xhttp.send(jsonData);
 
     // handle the audio tag with the new source
+    showUpNextInNavBar(upNextFrequencyTitle(frequency));
+
     window.top.postMessage("startaudio", "*");
 
     //console.log("postMessage startaudio");
@@ -963,6 +1006,8 @@ function advancedListenButtonClicked(form)
     xhttp.open("POST", baseUrl + "frequencylistenbuttonclicked.html", true);
     xhttp.send(jsonData);
 
+    showUpNextInNavBar(upNextFrequencyTitle(tuningArray.frequency));
+
     window.top.postMessage("startaudio", "*");
 
     return false;
@@ -996,6 +1041,8 @@ function scannerListenButtonClicked(form)
   xhttp.send(jsonData);
 
   // handle the audio tag with the new source
+  showUpNextInNavBar();
+
   window.top.postMessage("startaudio", "*");
 
   //console.log("postMessage startaudio");
@@ -1026,6 +1073,9 @@ function deviceListenButtonClicked(form)
   xhttp.send(jsonData);
 
   // handle the audio tag with the new source
+  var audioInputElem = form.elements['audio_input'];
+  showUpNextInNavBar(audioInputElem ? audioInputElem.value : undefined);
+
   window.top.postMessage("startaudio", "*");
 
   //console.log("postMessage startaudio");
@@ -1053,6 +1103,8 @@ function gqrxListenButtonClicked(form)
   xhttp.send(jsonData);
 
   // handle the audio tag with the new source
+  showUpNextInNavBar();
+
   window.top.postMessage("startaudio", "*");
 
   //console.log("postMessage startaudio");
@@ -1087,6 +1139,8 @@ function recordingListenButtonClicked(form)
   xhttp.send(jsonData);
 
   // handle the audio tag with the new source
+  showUpNextInNavBar(selected.value);
+
   window.top.postMessage("startaudio", "*");
 
   //console.log("postMessage startaudio");
@@ -1203,6 +1257,9 @@ function controlBoothListenButtonClicked(form)
   xhttp.open("POST", listenButtonClickedUrl, true);
   xhttp.send(jsonData);
 
+  var pipelineSelectElem = form.elements['pipeline_select'];
+  showUpNextInNavBar(pipelineSelectElem ? pipelineSelectElem.value : undefined);
+
   window.top.postMessage("startaudio", "*");
 }
 
@@ -1256,6 +1313,8 @@ function updateStatusDisplay(statusData)
     }
 
     gqrxUpdatePanel(statusObj.gqrx);
+    nowPlayingUpdatePipeline(statusObj.pipeline, statusObj.rtlsdr_task_mode);
+    nowPlayingUpdateDeviceNotice(statusObj.usb_device_unavailable);
 
     var rtlsdr_task_mode = statusObj.rtlsdr_task_mode;
     
@@ -1394,6 +1453,197 @@ function updateStatusDisplay(statusData)
 
     var nowPlayingNavBarLink = window.top.document.getElementById("nowPlayingNavBarLink");
     nowPlayingNavBarLink.innerText = "NOW PLAYING: " + station_name;
+}
+
+// Now Playing page's vertical pipeline diagram — a top-to-bottom version of
+// the native Status tab's SVG (StatusWebView.swift), fed by the "pipeline"
+// object in nowplayingstatus.html: {stages:[{name,detail,path,args,running,
+// link}], cli_text}. Status polls several times a second, so the SVG is only
+// rebuilt when the stages actually change.
+var nowPlayingPipelineStagesJSON = null;
+var nowPlayingPipelineCLIText = "";
+
+function nowPlayingEscapeHTML(s)
+{
+    return (s == null ? "" : String(s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function nowPlayingUpdatePipeline(pipeline, taskMode)
+{
+    var container = document.getElementById("np-pipeline");
+    if (container == null) return;   // not on nowplaying.html
+
+    var stages = (pipeline && pipeline.stages) ? pipeline.stages : [];
+    nowPlayingPipelineCLIText = (pipeline && pipeline.cli_text) ? pipeline.cli_text : "";
+
+    var copyButton = document.getElementById("np-copy-pipeline");
+    if (copyButton != null) copyButton.disabled = (nowPlayingPipelineCLIText === "");
+    var stopButton = document.getElementById("np-stop-pipeline");
+    if (stopButton != null) stopButton.disabled = (!taskMode || taskMode == "stopped");
+
+    var stagesJSON = JSON.stringify(stages);
+    if (stagesJSON === nowPlayingPipelineStagesJSON && container.firstChild != null) return;
+    nowPlayingPipelineStagesJSON = stagesJSON;
+
+    if (stages.length == 0)
+    {
+        container.innerHTML = "<p class='np-idle'>Pipeline idle — no tasks running.</p>";
+        return;
+    }
+
+    var NW = 280, NH = 60, GAP = 40, PADX = 2, PADY = 2;
+    var W = PADX * 2 + NW;
+    var H = PADY * 2 + stages.length * NH + (stages.length - 1) * GAP;
+    var svg = "<svg viewBox='0 0 " + W + " " + H + "' width='" + W + "' height='" + H + "'"
+        + " style='max-width: 100%; height: auto;' xmlns='http://www.w3.org/2000/svg'>";
+    svg += "<defs><marker id='np-ah' markerWidth='9' markerHeight='9' refX='7' refY='3' orient='auto'>"
+        + "<path d='M0,0 L7,3 L0,6 Z' class='np-arrowhead'/></marker></defs>";
+    for (var i = 0; i < stages.length; i++)
+    {
+        var s = stages[i];
+        var x = PADX;
+        var y = PADY + i * (NH + GAP);
+        var midX = x + NW / 2;
+        if (i > 0)
+        {
+            var y1 = y - GAP, y2 = y;
+            var udp = String(s.link || "").toUpperCase().indexOf("UDP") === 0;
+            svg += "<line x1='" + midX + "' y1='" + y1 + "' x2='" + midX + "' y2='" + (y2 - 3) + "'"
+                + " class='np-arrow" + (udp ? " udp" : "") + "' marker-end='url(#np-ah)'/>";
+            if (s.link)
+            {
+                svg += "<text x='" + (midX + 12) + "' y='" + ((y1 + y2) / 2 + 4) + "' class='np-link-label'>"
+                    + nowPlayingEscapeHTML(s.link) + "</text>";
+            }
+        }
+        // <title> gives a native hover tooltip with the full command line.
+        var tip = s.path + ((s.args && s.args.length) ? " " + s.args.join(" ") : "");
+        svg += "<g class='np-pnode'><title>" + nowPlayingEscapeHTML(tip) + "</title>";
+        svg += "<rect x='" + x + "' y='" + y + "' width='" + NW + "' height='" + NH + "' rx='12'"
+            + " class='np-node" + (s.running ? "" : " stopped") + "'/>";
+        svg += "<circle cx='" + (x + NW - 18) + "' cy='" + (y + 18) + "' r='5'"
+            + " class='" + (s.running ? "np-dot-run" : "np-dot-stop") + "'/>";
+        svg += "<text x='" + (x + 16) + "' y='" + (y + 26) + "' class='np-node-name'>" + nowPlayingEscapeHTML(s.name) + "</text>";
+        svg += "<text x='" + (x + 16) + "' y='" + (y + 45) + "' class='np-node-detail'>" + nowPlayingEscapeHTML(s.detail) + "</text>";
+        svg += "</g>";
+    }
+    svg += "</svg>";
+    container.innerHTML = svg;
+}
+
+// Hidden-textarea copy as the fallback: navigator.clipboard only exists in a
+// secure context, and most listeners reach this page over plain HTTP.
+function nowPlayingCopyPipeline()
+{
+    var text = nowPlayingPipelineCLIText;
+    if (!text) return;
+
+    var button = document.getElementById("np-copy-pipeline");
+    var copied = function ()
+    {
+        if (button == null) return;
+        button.value = "Copied";
+        setTimeout(function () { button.value = "Copy Pipeline"; }, 1500);
+    };
+
+    if (navigator.clipboard && window.isSecureContext)
+    {
+        navigator.clipboard.writeText(text).then(copied, function () { nowPlayingCopyPipelineFallback(text); copied(); });
+        return;
+    }
+    nowPlayingCopyPipelineFallback(text);
+    copied();
+}
+
+function nowPlayingCopyPipelineFallback(text)
+{
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+}
+
+// Mirrors the native Status tab's Stop Pipeline: tears down the pipeline on
+// the server. This page's <audio> element keeps playing, so the listener
+// hears the filler the server switches to (silence if filler is off).
+// Notice for a tune the RTL-SDR preflight refused — the dongle is busy or
+// missing (the usb_device_unavailable object in nowplayingstatus.html) — with
+// a Quit Gqrx and Retry button when Gqrx holds that very dongle.
+var nowPlayingDeviceNoticeMessage = null;
+
+function nowPlayingUpdateDeviceNotice(info)
+{
+    var notice = document.getElementById("np-device-notice");
+    if (notice == null) return;
+    var button = document.getElementById("np-quit-gqrx");
+    var message = info ? info.message : null;
+    if (message !== nowPlayingDeviceNoticeMessage)
+    {
+        // A new refusal (or none): re-arm the button a quit disabled.
+        nowPlayingDeviceNoticeMessage = message;
+        button.disabled = false;
+        button.value = "Quit Gqrx and Retry";
+    }
+    if (!info)
+    {
+        notice.hidden = true;
+        return;
+    }
+    document.getElementById("np-device-notice-text").textContent = info.message;
+    button.hidden = !info.can_quit_gqrx;
+    notice.hidden = false;
+}
+
+function nowPlayingQuitGqrx()
+{
+    var button = document.getElementById("np-quit-gqrx");
+    button.disabled = true;
+    button.value = "Quitting Gqrx\u2026";
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function ()
+    {
+        // Gqrx takes a few seconds to quit, then the tune retries; poll after.
+        if (this.readyState == 4) setTimeout(periodicUpdate, 4000);
+    };
+    xhttp.open("POST", "quitgqrxandretry.html", true);
+    xhttp.send();
+}
+
+// The Gqrx page's Quit Gqrx / Quit and Restart Gqrx buttons. Gqrx takes a few
+// seconds to quit (and longer to relaunch), so the page — whose Launch vs.
+// Quit buttons depend on whether Gqrx is running — reloads after a delay.
+function gqrxQuitApp(restart)
+{
+    var buttons = document.querySelectorAll(".gqrx-app-buttons input");
+    for (var i = 0; i < buttons.length; i++) buttons[i].disabled = true;
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function ()
+    {
+        if (this.readyState == 4)
+            setTimeout(function () { loadContent("devicegqrx.html"); }, restart ? 8000 : 4000);
+    };
+    xhttp.open("POST", restart ? "restartgqrx.html" : "quitgqrx.html", true);
+    xhttp.send();
+}
+
+function nowPlayingStopPipeline()
+{
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function ()
+    {
+        if (this.readyState == 4)
+        {
+            periodicUpdate();
+        }
+    };
+    xhttp.open("POST", "nowplayingstoppipeline.html", true);
+    xhttp.send();
 }
 
 var intervalID = setInterval(function(){periodicUpdate();}, 20000);     // for Now Playing periodic updates using setInterval()
@@ -1722,6 +1972,16 @@ var aacRecorderPollIntervalID = setInterval(aacRecorderPoll, 5000);
 
 // ---- ControlBooth Remote Control (controlbooth.html) --------------------
 //
+// controlbooth.html is a menu of four pages (Remote Control, AntennaHead
+// Radio, AirPlay Receiver, dsd-neo Scanner). Every poll below reloads the
+// page that's showing, named in #controlbooth_status's data-page.
+
+function controlBoothCurrentPage()
+{
+    var statusEl = document.getElementById("controlbooth_status");
+    return (statusEl && statusEl.getAttribute("data-page")) || "controlbooth.html";
+}
+//
 // Polls /api/v1/controlbooth/status — reflects ControlBoothClient
 // .isControlBoothRunning, an NSRunningApplication check that goes false
 // essentially the moment the process exits. ControlBooth also sends
@@ -1730,7 +1990,14 @@ var aacRecorderPollIntervalID = setInterval(aacRecorderPoll, 5000);
 // no push channel from server to browser here — so if this page is open
 // when ControlBooth quits, it's this poll noticing isRunning no longer
 // matches what was rendered that reloads the fragment (same call the
-// Refresh button makes) to show "Not running". No-op until the fragment
+// Refresh button makes) to show "Not running". It also reloads when the
+// active pipeline (data-active) changes — ControlBooth's Play/Stop buttons
+// tell AntennaHead over AppleEvents, and this is how the page notices. Also
+// reloads on data-airplay-relay/data-airplay-receiving changes, so toggling
+// the AirPlay relay (from here, from ControlBooth's own Settings UI, or an
+// AirPlay client connecting/disconnecting) shows up within one poll tick —
+// no separate poll loop for it.
+// No-op until the fragment
 // (and its data-running marker) is in the DOM, same as aacRecorderPoll.
 function controlBoothPoll()
 {
@@ -1743,9 +2010,19 @@ function controlBoothPoll()
             try {
                 var data = JSON.parse(this.responseText);
                 var renderedRunning = (statusEl.getAttribute("data-running") == "true");
-                if (!!data.isRunning !== renderedRunning)
+                var renderedActive = statusEl.getAttribute("data-active") || "";
+                var currentActive = data.activePipelineName || "";
+                // Only the AirPlay Receiver page carries the AirPlay state.
+                var airPlayChanged = false;
+                if (statusEl.hasAttribute("data-airplay-relay")) {
+                    var renderedAirPlayRelay = (statusEl.getAttribute("data-airplay-relay") == "true");
+                    var renderedAirPlayReceiving = (statusEl.getAttribute("data-airplay-receiving") == "true");
+                    airPlayChanged = !!data.airPlayRelayEnabled !== renderedAirPlayRelay
+                        || !!data.airPlayReceivingAudio !== renderedAirPlayReceiving;
+                }
+                if (!!data.isRunning !== renderedRunning || currentActive !== renderedActive || airPlayChanged)
                 {
-                    loadContent("controlbooth.html");
+                    loadContent(controlBoothCurrentPage());
                 }
             } catch (e) { /* ignore a malformed response */ }
         }
@@ -1756,6 +2033,138 @@ function controlBoothPoll()
 
 var controlBoothPollIntervalID = setInterval(controlBoothPoll, 3000);
 
+// The dsd-neo Scanner section of controlbooth.html. Its status line and
+// "Lock Out TG n" button follow the talkgroup in place; the fragment is only
+// reloaded when the scanner starts/stops or its mode changes, so a talkgroup
+// number being typed below isn't wiped out by every new call.
+function controlBoothDsdNeoPoll()
+{
+    var sectionEl = document.getElementById("dsdneo_section");
+    if (!sectionEl) return;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState != 4 || this.status != 200) return;
+        try {
+            var data = JSON.parse(this.responseText);
+            if (!data.available) return;   // controlBoothPoll() handles ControlBooth quitting
+            if (data.state !== sectionEl.getAttribute("data-state")
+                || data.mode !== sectionEl.getAttribute("data-mode"))
+            {
+                loadContent(controlBoothCurrentPage());
+                return;
+            }
+            var statusEl = document.getElementById("dsdneo_status");
+            if (statusEl) statusEl.textContent = data.statusText;
+            var rowEl = document.getElementById("dsdneo_current_row");
+            if (rowEl && String(data.talkgroup) !== rowEl.getAttribute("data-talkgroup")) {
+                rowEl.setAttribute("data-talkgroup", String(data.talkgroup));
+                rowEl.innerHTML = "";
+                if (data.talkgroup > 0) {
+                    var button = document.createElement("input");
+                    button.type = "button";
+                    button.className = "button";
+                    button.value = "Lock Out TG " + data.talkgroup;
+                    button.onclick = function() { controlBoothDsdNeoPolicy(data.talkgroup, "lockout"); };
+                    rowEl.appendChild(button);
+                }
+            }
+        } catch (e) { /* ignore a malformed response */ }
+    };
+    xhttp.open("GET", "/controlboothdsdneostatus.json", true);
+    xhttp.send();
+}
+
+var controlBoothDsdNeoPollIntervalID = setInterval(controlBoothDsdNeoPoll, 2000);
+
+// The AntennaHead Radio section of controlbooth.html: reloaded when the
+// station starts or stops (so the right button shows); the status line
+// ("On the Air: Weather"), song and Skip Song's enabled state are updated
+// in place.
+function controlBoothRadioPoll()
+{
+    var sectionEl = document.getElementById("radio_section");
+    if (!sectionEl) return;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState != 4 || this.status != 200) return;
+        try {
+            var data = JSON.parse(this.responseText);
+            if (!data.available) return;   // controlBoothPoll() handles ControlBooth quitting
+            var onAir = function(phase) { return phase != "stopped"; };
+            var rendered = sectionEl.getAttribute("data-phase");
+            if (onAir(data.phase) !== onAir(rendered)
+                || (data.phase === "stopping") !== (rendered === "stopping"))
+            {
+                loadContent(controlBoothCurrentPage());
+                return;
+            }
+            var statusEl = document.getElementById("radio_status");
+            if (statusEl) statusEl.textContent = data.statusText;
+            var songEl = document.getElementById("radio_now_playing");
+            if (songEl) songEl.textContent = data.nowPlaying ? "Now playing: " + data.nowPlaying : "";
+            var skipEl = document.getElementById("radio_skip");
+            if (skipEl) skipEl.disabled = !data.canSkip;
+        } catch (e) { /* ignore a malformed response */ }
+    };
+    xhttp.open("GET", "/controlboothradiostatus.json", true);
+    xhttp.send();
+}
+
+var controlBoothRadioPollIntervalID = setInterval(controlBoothRadioPoll, 2000);
+
+// Go On Air: like the Listen buttons, start the page's audio player too —
+// inside the click, so the browser allows playback. The station opens
+// AntennaHead's input itself a moment later.
+function controlBoothRadioGoOnAirClicked(sourceName)
+{
+    loadContent("controlboothradio.html?action=start");
+    window.top.nowPlayingTitle = window.document.getElementById("listen_title");
+    showUpNextInNavBar(sourceName);
+    window.top.postMessage("startaudio", "*");
+}
+
+function controlBoothDsdNeoApplyMode(form)
+{
+    var mode = form.elements["mode"].value;
+    var tg = form.elements["tg"].value;
+    loadContent("controlboothdsdneo.html?action=mode&mode=" + encodeURIComponent(mode)
+                + "&tg=" + encodeURIComponent(tg));
+}
+
+function controlBoothDsdNeoPolicy(talkgroup, policy)
+{
+    loadContent("controlboothdsdneo.html?action=policy&policy=" + encodeURIComponent(policy)
+                + "&tg=" + encodeURIComponent(talkgroup));
+}
+
+function controlBoothDsdNeoAddPolicy(form, policy)
+{
+    controlBoothDsdNeoPolicy(form.elements["tg"].value, policy);
+}
+
+function controlBoothAirPlayListenButtonClicked()
+{
+    var getUrl = window.location;
+    var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+    var url = baseUrl + "controlboothairplaylisten.html";
+
+    // Mirrors controlBoothListenButtonClicked(): this route replies with a
+    // bare 200 (see AntennaHeadHTTPServer), so the fragment picks up the new
+    // AirPlay status on the next controlBoothPoll() tick rather than here.
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            window.top.nowPlayingTitle = window.document.getElementById("listen_title");
+        }
+    };
+    xhttp.open("POST", url, true);
+    xhttp.send();
+
+    window.top.postMessage("startaudio", "*");
+}
+
 
 // ---- Live Captions (captions.html) -------------------------------------
 //
@@ -1763,7 +2172,13 @@ var controlBoothPollIntervalID = setInterval(controlBoothPoll, 3000);
 // SDRController's TranscriptionCaptionListener, which consumes the
 // PCMTranscriber tap's newline-delimited JSON on UDP 6023. Runs globally
 // like aacRecorderPoll(); it's a no-op until the captions fragment is in
-// the DOM. Shape: {"enabled":bool, "live":str, "final":[str,...]}.
+// the DOM. Shape: {"enabled":bool, "live":str,
+// "final":[{"text":str,"announcement":bool},...]}. A `final` entry with
+// "announcement":true is a synthesized line echoing the spoken "Now
+// playing …" clip (SDRController.insertAnnouncementCaption) rather than a
+// transcribed one — rendered in italics with a leading marker, since
+// `resetCaptions()` wipes the transcript on every retune and this is the
+// first line of the new one.
 var captionsLastRenderedSeq = -1;
 var captionsPollInFlight = false;
 
@@ -1822,7 +2237,15 @@ function updateCaptionsDisplay(data)
             var html = "";
             for (var i = 0; i < finals.length; i++)
             {
-                html += "<p>" + captionsEscapeHTML(finals[i]) + "</p>";
+                // Each entry is normally {"text":str,"announcement":bool}; a
+                // bare string is accepted too so an older server frame still
+                // renders (just without the announcement styling).
+                var entry = finals[i];
+                var isObject = (entry !== null && typeof entry === "object");
+                var lineText = isObject ? entry.text : entry;
+                var isAnnouncement = isObject && !!entry.announcement;
+                var cssClass = isAnnouncement ? " class='caption-announcement'" : "";
+                html += "<p" + cssClass + ">" + captionsEscapeHTML(lineText) + "</p>";
             }
             transcript.innerHTML = html;
             transcript.scrollTop = transcript.scrollHeight;   // keep newest in view
@@ -1888,6 +2311,250 @@ function textToSpeechListenButtonClicked(form)
   xhttp.send(JSON.stringify(payload));
 
   // handle the audio tag with the new source
+  showUpNextInNavBar();
+
+  window.top.postMessage("startaudio", "*");
+}
+
+
+// Speak Text section (bottom of the Text to Speech page): speaks the text
+// box once with the chosen voice ("" = the Text to Speech voice setting).
+// Text starting with <speak> is SSML — the server decides.
+function speakTextButtonClicked(form)
+{
+  var textArea = form.querySelector("#tts_speak_text");
+  var voiceSelect = form.querySelector("#tts_speak_voice");
+  var payload = {
+    text: textArea ? textArea.value : "",
+    voice: voiceSelect ? voiceSelect.value : ""
+  };
+
+  var getUrl = window.location;
+  var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        window.top.nowPlayingTitle = window.document.getElementById("listen_title");
+      }
+    };
+  xhttp.open("POST", baseUrl + "speaktextbuttonclicked.html", true);
+  xhttp.setRequestHeader("Content-Type", "application/json");
+  xhttp.send(JSON.stringify(payload));
+
+  showUpNextInNavBar();
+
+  window.top.postMessage("startaudio", "*");
+}
+
+
+// ---- Play Audio Files (Audio Devices page) ------------------------------
+//
+// Same pattern as Text to Speech above: the folder is chosen in
+// AntennaHead's Configuration tab on the Mac running AntennaHead (a folder
+// chooser can't be shown to a remote browser), where it's saved as a
+// persistent setting (security-scoped bookmark). playAudioFilesListHTML()
+// (server-side) renders one checkbox per audio file, checked by default.
+// Listen sends the order, the repeat flag, and the names still checked —
+// the server resolves the saved folder, stages just those audio files, and
+// feeds them to the PCMFilePlayer pipeline stage.
+
+// Select All / Select None buttons above the file list — purely client-side,
+// no round trip.
+function pafSelectAllFiles(selected)
+{
+  var checkboxes = document.querySelectorAll(".paf-file-checkbox");
+  checkboxes.forEach(function(checkbox) { checkbox.checked = selected; });
+}
+
+// Playlist popup (only rendered when the folder has .m3u/.m3u8 files):
+// picking one plays exactly its files, in its own order, so the Sequence
+// select and the per-file checkboxes no longer apply — grey them out to
+// make that clear rather than leaving them clickable but ignored. Picking
+// "None" back reverses it.
+function pafPlaylistChanged(select)
+{
+  var disable = !!select.value;
+  var form = select.form;
+  var sequenceSelect = form.querySelector("#paf_sequence");
+  if (sequenceSelect) sequenceSelect.disabled = disable;
+  var checkboxes = form.querySelectorAll(".paf-file-checkbox");
+  checkboxes.forEach(function(checkbox) { checkbox.disabled = disable; });
+}
+
+function playAudioFilesListenButtonClicked(form)
+{
+  var sequenceSelect = form.querySelector("#paf_sequence");
+  var repeatCheckbox = form.querySelector("#paf_repeat");
+  var playlistSelect = form.querySelector("#paf_playlist");
+  var fileCheckboxes = form.querySelectorAll(".paf-file-checkbox:checked");
+  var selectedFiles = Array.prototype.map.call(fileCheckboxes, function(checkbox) {
+    return checkbox.value;
+  });
+  var payload = {
+    sequence: sequenceSelect ? sequenceSelect.value : "chronological",
+    repeat: (repeatCheckbox && repeatCheckbox.checked) ? "1" : "0",
+    files: selectedFiles,
+    playlist: playlistSelect ? playlistSelect.value : ""
+  };
+
+  var getUrl = window.location;
+  var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+  var listenButtonClickedUrl = baseUrl + "playaudiofileslistenbuttonclicked.html";
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        // response received ok
+        window.top.nowPlayingTitle = window.document.getElementById("listen_title");
+      }
+    };
+  xhttp.open("POST", listenButtonClickedUrl, true);
+  xhttp.setRequestHeader("Content-Type", "application/json");
+  xhttp.send(JSON.stringify(payload));
+
+  // handle the audio tag with the new source
+  showUpNextInNavBar();
+
+  window.top.postMessage("startaudio", "*");
+}
+
+
+// ---- Speak RSS Headlines (Audio Devices page) ---------------------------
+//
+// Feed subscriptions are managed right on this page (add/edit/delete/import),
+// not in Configuration — a subscription list is structured data, not a
+// Mac-only folder choice. rssFeedsTableHTML() (server-side) renders one
+// checkbox per feed, checked by default, each linking to editrssfeed.html.
+// Listen sends the checked feed ids plus the reading options; the server
+// fetches those feeds live, renders each headline to its own speech clip,
+// and plays them in order.
+
+function storeRSSFeedRecord(form)
+{
+  var formArray = $(form).serializeArray();
+  var jsonData = JSON.stringify(formArray);
+
+  var getUrl = window.location;
+  var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+  var storeUrl = baseUrl + "storerssfeed.html";
+
+  sendHTTPPostRequest("rss_feed", storeUrl, jsonData, 1, false, true);
+
+  return false;
+}
+
+function deleteRSSFeedRecord(form)
+{
+  var formArray = $(form).serializeArray();
+  var jsonData = JSON.stringify(formArray);
+
+  var getUrl = window.location;
+  var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+  var deleteUrl = baseUrl + "deleterssfeed.html";
+
+  var feedName = form.name.value;
+  var r = confirm("Delete \"" + feedName + "\" feed?");
+  if (r != true) return;
+
+  sendHTTPPostRequest("rss_feed", deleteUrl, jsonData, 3, false, false);
+
+  window.topButtonClicked(self);
+}
+
+function addRSSFeedRecord(form)
+{
+  var newFeedURL = form.feed_url.value;
+
+  if (newFeedURL > "")
+  {
+    var formArray = $(form).serializeArray();
+    var jsonData = JSON.stringify(formArray);
+
+    var getUrl = window.location;
+    var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+    var addUrl = baseUrl + "addrssfeed.html";
+
+    sendHTTPPostRequest("rss_feed", addUrl, jsonData, 1, false, true);
+  }
+  else
+  {
+    alert("Feed URL is required.");
+  }
+
+  return false;
+}
+
+// "Import OPML…" triggers the hidden file input; this fires on its change
+// event. Reads the file client-side (FileReader), so this works from any
+// browser hitting AntennaHead, not just the host Mac — unlike the Text to
+// Speech/Play Audio Files folder, an OPML file is just bytes to hand over,
+// not a Mac-local path.
+function importOPMLFeeds(fileInput)
+{
+  var file = fileInput.files && fileInput.files[0];
+  if (!file) return;
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var getUrl = window.location;
+    var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+    var importUrl = baseUrl + "importopmlfeeds.html";
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var result = JSON.parse(this.responseText);
+        alert(result.imported + " feed(s) imported.");
+        window.topButtonClicked(self);
+      }
+    };
+    xhttp.open("POST", importUrl, true);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify({opml: e.target.result}));
+  };
+  reader.readAsText(file);
+}
+
+// Shows/hides the two co-anchor voice pickers based on the Voice <select>.
+function rssVoiceModeChanged(select)
+{
+  var wrapper = document.getElementById("rss_alternate_voices");
+  if (wrapper) wrapper.style.display = (select.value == "alternate") ? "block" : "none";
+}
+
+function speakRSSHeadlinesListenButtonClicked(form)
+{
+  var feedCheckboxes = form.querySelectorAll(".rss-feed-checkbox:checked");
+  var feedIDs = Array.prototype.map.call(feedCheckboxes, function(checkbox) {
+    return checkbox.value;
+  });
+  var payload = {
+    feeds: feedIDs,
+    items_per_feed: form.querySelector("#rss_items_per_feed").value,
+    voice_mode: form.querySelector("#rss_voice_mode").value,
+    voice_a: form.querySelector("#rss_voice_a").value,
+    voice_b: form.querySelector("#rss_voice_b").value,
+    repeat: (form.querySelector("#rss_repeat").checked) ? "1" : "0"
+  };
+
+  var getUrl = window.location;
+  var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+  var listenButtonClickedUrl = baseUrl + "speakrssheadlineslistenbuttonclicked.html";
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        // response received ok
+        window.top.nowPlayingTitle = window.document.getElementById("listen_title");
+      }
+    };
+  xhttp.open("POST", listenButtonClickedUrl, true);
+  xhttp.setRequestHeader("Content-Type", "application/json");
+  xhttp.send(JSON.stringify(payload));
+
+  // handle the audio tag with the new source
+  showUpNextInNavBar();
+
   window.top.postMessage("startaudio", "*");
 }
 

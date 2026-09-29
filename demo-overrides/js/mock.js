@@ -27,6 +27,8 @@
     "intervalID",
     "aacRecorderPollIntervalID",
     "controlBoothPollIntervalID",
+    "controlBoothDsdNeoPollIntervalID",
+    "controlBoothRadioPollIntervalID",
     "captionsPollIntervalID",
     "aacRecorderTickIntervalID"
   ].forEach(function (id) {
@@ -38,6 +40,8 @@
   window.aacRecorderPoll = noop;
   window.aacRecorderTick = noop;
   window.controlBoothPoll = noop;
+  window.controlBoothDsdNeoPoll = noop;
+  window.controlBoothRadioPoll = noop;
   window.captionsPoll = noop;
   window.startNowPlayingUpdates = noop;
   window.stopNowPlayingUpdates = noop;
@@ -168,8 +172,79 @@
   var CONTROLBOOTH_TILE =
     '<div class="six columns value-prop">' + icon("controlbooth") +
     '<div class="value-prop"><a class="button button-primary" ' +
-    'onclick="window.__ahPreviewToast(\'Preview only — pair with ControlBooth in the app\')">' +
-    "ControlBooth</a></div>Receive a live mix pushed from ControlBooth.</div>";
+    'onclick="loadContent(\'controlbooth.html\');">' +
+    "ControlBooth</a></div>Start a ControlBooth pipeline<br>as the audio source</div>";
+
+  /* ControlBooth pages. The real app renders these on the server
+     (controlBoothPageHTML() in AntennaHeadHTTPServer.swift); these fixtures
+     mirror its markup with sample data: the radio on the air, a few
+     pipelines, the AirPlay receiver idle, the dsd-neo scanner mid-call. */
+  var CB_PAGES = {
+    "controlbooth.html": "ControlBooth",
+    "controlboothpipelines.html": "ControlBooth Remote Control",
+    "controlboothradiopage.html": "AntennaHead Radio",
+    "controlboothairplay.html": "AirPlay Receiver",
+    "controlboothdsdneopage.html": "dsd-neo Scanner"
+  };
+  var CB_NOW_PLAYING = "AntennaHead Radio";
+
+  function cbPreviewButton(value, primary) {
+    return '<input class="twelve columns button' + (primary ? " button-primary" : "") + '" type="button" value="' +
+      value + '" onclick="window.__ahPreviewToast(\'Preview only — this needs ControlBooth on the Mac\')"><br>&nbsp;<br>';
+  }
+  function cbTile(iconName, page, description) {
+    return '<div class="six columns value-prop">' + icon(iconName) +
+      '<div class="value-prop"><a class="button button-primary" onclick="loadContent(\'' + page + '\');">' +
+      CB_PAGES[page] + "</a></div>" + description + "</div>";
+  }
+  function controlBoothPage(page) {
+    var s = '<div class="container"><section class="header"><h2 class="title">AntennaHead</h2>' +
+      '<h3 class="title" id="listen_title">' + CB_PAGES[page] + "</h3>" +
+      '<p id="controlbooth_status" data-page="' + page + '">ControlBooth: <strong style="color:green">Running</strong></p>' +
+      '<p id="controlbooth_active">Now playing: <strong>' + CB_NOW_PLAYING + "</strong></p>";
+    if (page === "controlbooth.html") {
+      s += '<div class="value-prop row">' +
+        cbTile("cbradio", "controlboothradiopage.html", "Music with an announcer, news<br>and weather, on the air") +
+        cbTile("cbremote", "controlboothpipelines.html", "Start a ControlBooth pipeline<br>as the audio source") +
+        '</div><div class="value-prop row">' +
+        cbTile("cbairplay", "controlboothairplay.html", "Play AirPlay audio sent<br>to ControlBooth") +
+        cbTile("cbdsdneo", "controlboothdsdneopage.html", "Follow a P25 trunked system<br>with dsd-neo") +
+        "</div>";
+    } else if (page === "controlboothradiopage.html") {
+      s += '<div id="radio_section" data-phase="onAir">' +
+        '<p>Station: <strong id="radio_status">On the Air</strong></p>' +
+        '<p id="radio_now_playing">Now playing: Cheap Sunglasses — ZZ Top</p>' +
+        cbPreviewButton("Skip Song") + cbPreviewButton("Stop") + "</div>";
+    } else if (page === "controlboothpipelines.html") {
+      s += '<label for="pipeline_select">Select Pipeline:</label>' +
+        '<select name="pipeline_select" class="twelve columns value-prop">' +
+        ["KUAR-FM 89.1-1 Little Rock HD Radio", "KLRE-FM 90.5-1 Little Rock HD Radio",
+         "NOAA Weather Radio", "Test 100.3 NRSC5"].map(function (p) {
+          return "<option>" + p + "</option>";
+        }).join("") + "</select><br><br>" +
+        cbPreviewButton("Listen", true) + cbPreviewButton("Stop");
+    } else if (page === "controlboothairplay.html") {
+      s += "<p>AirPlay Receiver: <strong>Idle — advertising, no AirPlay client connected</strong></p>" +
+        cbPreviewButton("Listen", true);
+    } else if (page === "controlboothdsdneopage.html") {
+      s += '<p>Scanner: <strong id="dsdneo_status">Scanning — TG 2101 Pulaski County Sheriff</strong></p>' +
+        cbPreviewButton("Stop") + cbPreviewButton("Skip Call") +
+        '<label for="dsdneo_mode">Follow:</label><select id="dsdneo_mode" class="twelve columns">' +
+        '<option selected>Scan all talkgroups</option><option>Always Allow talkgroups only</option>' +
+        "<option>Hold one talkgroup</option></select>" + cbPreviewButton("Apply") +
+        '<p><input class="button" type="button" value="Lock Out TG 2101" ' +
+        'onclick="window.__ahPreviewToast(\'Preview only — this needs ControlBooth on the Mac\')"></p>' +
+        '<h5>Locked Out Talkgroups</h5><table class="u-full-width"><tbody>' +
+        '<tr><td>Encrypted (TG 1417)</td><td><input class="button" type="button" value="Remove" ' +
+        'onclick="window.__ahPreviewToast(\'Preview only — this needs ControlBooth on the Mac\')"></td></tr>' +
+        "</tbody></table>";
+    }
+    s += '<br><input class="button" type="button" value="Refresh" onclick="loadContent(\'' + page + '\');">';
+    if (page !== "controlbooth.html") {
+      s += ' <input class="button" type="button" value="ControlBooth Menu" onclick="loadContent(\'controlbooth.html\');">';
+    }
+    return s + "<br>&nbsp;<br></section></div>";
+  }
 
   // "Listen to Gqrx" tile on the Radio page (the real app injects it when Gqrx
   // integration is enabled in Configuration).
@@ -194,6 +269,8 @@
     AUDIO_INPUT_ICON: icon("audioinput"),
     GQRX_ICON: icon("gqrx"),
     TEXT_TO_SPEECH_ICON: icon("texttospeech"),
+    PLAY_AUDIO_FILES_ICON: icon("playaudiofiles"),
+    SPEAK_RSS_HEADLINES_ICON: icon("rss"),
     LOCALRADIO_ANIMATION: icon("AntennaHead-animation"),
     CONTROLBOOTH_TILE: CONTROLBOOTH_TILE,
     GQRX_TILE: GQRX_TILE,
@@ -220,6 +297,10 @@
     DEVICES_FORM: NOT_IN_PREVIEW,
     GQRX_FORM: NOT_IN_PREVIEW,
     TEXT_TO_SPEECH_FORM: NOT_IN_PREVIEW,
+    PLAY_AUDIO_FILES_FORM: NOT_IN_PREVIEW,
+    SPEAK_RSS_HEADLINES_FORM: NOT_IN_PREVIEW,
+    ADD_RSS_FEED_FORM: NOT_IN_PREVIEW,
+    EDIT_RSS_FEED: NOT_IN_PREVIEW,
     EDIT_FAVORITE: NOT_IN_PREVIEW,
     EDIT_CATEGORY_SETTINGS: NOT_IN_PREVIEW,
     VIEW_FAVORITE_ITEM: NOT_IN_PREVIEW,
@@ -277,6 +358,23 @@
   function mockFor(method, url, body) {
     var u = String(url);
     method = String(method || "GET").toUpperCase();
+
+    // ControlBooth pages, and their actions (which stay on the same page).
+    var cbPage = u.replace(/^.*\//, "").replace(/\?.*$/, "");
+    if (Object.prototype.hasOwnProperty.call(CB_PAGES, cbPage)) return { body: controlBoothPage(cbPage) };
+    var CB_ACTIONS = {
+      "controlboothradio.html": "controlboothradiopage.html",
+      "controlboothstop.html": "controlboothpipelines.html",
+      "controlboothairplaystop.html": "controlboothairplay.html",
+      "controlboothdsdneo.html": "controlboothdsdneopage.html",
+      "controlboothlaunched.html": "controlbooth.html"
+    };
+    if (Object.prototype.hasOwnProperty.call(CB_ACTIONS, cbPage)) {
+      return { body: controlBoothPage(CB_ACTIONS[cbPage]), toast: "Preview only — this needs ControlBooth on the Mac" };
+    }
+    if (/controlbooth(listenbuttonclicked|airplaylisten)\.html$/.test(u)) {
+      return { body: "", toast: "Preview only — this needs ControlBooth on the Mac" };
+    }
 
     if (/nowplayingstatus\.html$/.test(u)) return { body: JSON.stringify(NOW_PLAYING_STATUS) };
     if (/rtlsdrdevices\.html$/.test(u)) return { body: JSON.stringify(["RTL2838 (00000001)"]) };

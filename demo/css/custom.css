@@ -689,6 +689,61 @@ html {
     margin-bottom: 4px;
 }
 
+/* Now Playing page's vertical pipeline diagram (nowPlayingUpdatePipeline in
+   antennahead.js) — a top-to-bottom version of the native Status tab's SVG. */
+.np-pipeline-section { margin-top: 24px; text-align: center; }
+.np-pipeline { padding: 4px 2px 8px; }
+.np-pipeline .np-idle {
+    color: var(--ah-muted, #6e6e73);
+    font-style: italic;
+    margin: 6px 2px;
+}
+.np-pipeline rect.np-node {
+    fill: var(--ah-node-fill, #f5f9ff);
+    stroke: var(--ah-node-stroke, #0a84ff);
+    stroke-width: 1.5;
+}
+.np-pipeline rect.np-node.stopped { stroke: #8e8e93; }
+.np-pipeline circle.np-dot-run { fill: #34c759; }
+.np-pipeline circle.np-dot-stop { fill: #ff453a; }
+.np-pipeline text.np-node-name {
+    fill: var(--ah-fg, #1c1c1e);
+    font-size: 13px;
+    font-weight: 600;
+}
+.np-pipeline text.np-node-detail { fill: var(--ah-muted, #6e6e73); font-size: 11px; }
+.np-pipeline line.np-arrow { stroke: #8e8e93; stroke-width: 1.5; }
+.np-pipeline line.np-arrow.udp { stroke: var(--ah-node-stroke, #0a84ff); stroke-dasharray: 4 3; }
+.np-pipeline path.np-arrowhead { fill: #8e8e93; }
+.np-pipeline text.np-link-label {
+    fill: var(--ah-muted, #6e6e73);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.np-pipeline-buttons .button { margin: 0 4px 10px; }
+
+/* Now Playing's notice for a tune the RTL-SDR preflight refused (dongle busy
+   or missing) — see nowPlayingUpdateDeviceNotice in antennahead.js. */
+.np-device-notice {
+    margin: 12px auto 4px;
+    max-width: 34em;
+    padding: 10px 14px 4px;
+    border: 1px solid light-dark(#c93400, #ff9f0a);
+    border-radius: 8px;
+    background: light-dark(#fff4e5, #3a2a12);
+    color: var(--ah-fg, #1c1c1e);
+    text-align: center;
+}
+.np-device-notice p { margin: 0 0 8px; }
+.np-device-notice .button { margin-bottom: 6px; }
+/* Skeleton's `.button { display: inline-block }` would override `hidden`. */
+.np-device-notice[hidden], .np-device-notice .button[hidden] { display: none; }
+
+/* The Gqrx page's Quit Gqrx / Quit and Restart Gqrx buttons (gqrxFormHTML). */
+.gqrx-app-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.gqrx-app-buttons .button { flex: 1 1 12em; margin: 0; }
+
 /* AAC recorder toggle, shown next to the <audio> element in the bottom bar.
    flex-shrink:0 keeps it from being squeezed out when the row is tight (see
    #audiodiv in index.html, which lets the <audio> element shrink instead). */
@@ -736,6 +791,36 @@ html {
     font-size: 12px;
     color: #ff3b30;
     margin-left: 2px;
+}
+/* Native-player controls, used instead of the <audio> element when the page
+   runs inside the AntennaHead iOS app (see nativeAudioBridge() in
+   index.html). The app plays the stream itself with AVPlayer, so this row is
+   just a play/pause button, the app's status text, and a way back to the
+   app's server list. */
+.native-audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.native-audio-controls .native-audio-btn {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    line-height: 32px;
+}
+.native-audio-status {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    color: var(--ah-muted, #6e6e73);
 }
 /* Compact file size shown beside each recording's name in the list. */
 .rec-size {
@@ -974,6 +1059,16 @@ svg.lr-animation {
     padding: 10px;
     box-sizing: border-box;
 }
+/* Dark mode: invert the whole scene (line art and title text go white, the white card goes
+   black; hue-rotate keeps the blue links/clefs blue), and give the five embedded photos a
+   second inversion so they come out in their original colours. Same trick as the project
+   site. The url(#ah-invert) filter is defined in info.html. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) svg.lr-animation { filter: invert(1) hue-rotate(180deg); }
+    :root:not([data-theme="light"]) svg.lr-animation image { filter: url(#ah-invert); }
+}
+:root[data-theme="dark"] svg.lr-animation { filter: invert(1) hue-rotate(180deg); }
+:root[data-theme="dark"] svg.lr-animation image { filter: url(#ah-invert); }
 
 /* ---- Live Captions page (captions.html) -----------------------------------
    Fed by /captions.json (SDRController.TranscriptionCaptionListener, which
@@ -1005,6 +1100,22 @@ svg.lr-animation {
 .caption-transcript:empty::before {
     content: "Waiting for speech\2026";
     opacity: 0.55;
+}
+/* A synthesized "Now playing …" marker line (SDRController.
+   insertAnnouncementCaption) rather than a transcribed one. It's always the
+   first line of a freshly-reset transcript, so the top border/spacing reads
+   as the boundary between the previous source's captions and this one's. */
+.caption-transcript p.caption-announcement {
+    font-style: italic;
+    opacity: 0.75;
+    border-top: 1px solid var(--ah-border);
+    padding-top: 0.45em;
+    margin-top: 0.45em;
+}
+.caption-transcript p.caption-announcement:first-child {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
 }
 .caption-live {
     margin-top: 10px;
