@@ -117,6 +117,7 @@ a:hover { text-decoration: underline; }
   display: inline-block; padding: 10px 18px; border-radius: 10px;
   font-weight: 600; font-size: 15px; border: 1px solid var(--border);
   background: var(--bg-2); color: var(--fg);
+  max-width: 100%; overflow-wrap: anywhere;   /* long URL labels on small phones */
 }
 .btn:hover { text-decoration: none; border-color: var(--fg-3); }
 .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: transparent; }
@@ -132,7 +133,7 @@ section.band > .wrap > p.sub { color: var(--fg-2); margin: 0 0 1.8em; max-width:
 /* ---- feature grid ---- */
 .grid {
   display: grid; gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
 }
 .card {
   background: var(--bg-2); border: 1px solid var(--border);
@@ -146,11 +147,11 @@ section.band > .wrap > p.sub { color: var(--fg-2); margin: 0 0 1.8em; max-width:
   display: grid; gap: 34px; align-items: start;
   grid-template-columns: minmax(0, 1fr) auto;
 }
-@media (max-width: 820px) { .demo-layout { grid-template-columns: 1fr; } }
+@media (max-width: 820px) { .demo-layout { grid-template-columns: minmax(0, 1fr); } }
 
 .phone {
   --w: 340px;
-  width: var(--w);
+  width: min(var(--w), 100%);   /* shrinks on phones narrower than the frame */
   margin: 0 auto;
   background: #0c0c0d;
   border-radius: 46px;
@@ -171,7 +172,7 @@ section.band > .wrap > p.sub { color: var(--fg-2); margin: 0 0 1.8em; max-width:
 .demo-note { font-size: .9rem; color: var(--fg-3); margin-top: 12px; text-align: center; }
 
 /* ---- video ---- */
-.video-grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.video-grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
 figure.clip { margin: 0; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 figure.clip video { display: block; width: 100%; background: #000; aspect-ratio: 9 / 16; object-fit: contain; }
 figure.clip.landscape video { aspect-ratio: 16 / 9; }
@@ -203,7 +204,7 @@ figure.clip .missing {
         border-left: 4px solid var(--radio); border-radius: 8px; background: var(--bg-2); font-size: .95rem; }
 
 /* ---- ecosystem list ---- */
-.repos { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.repos { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); }
 .repo { display: block; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
 .repo:hover { border-color: var(--fg-3); text-decoration: none; }
 .repo b { color: var(--fg); }
