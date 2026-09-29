@@ -223,7 +223,10 @@
     function bodyElementLoaded(event)
     {
         console.log("bodyElementLoaded");
-        loadContent("index2.html");
+        // Deep link: demo/index.html#devices.html opens that page (Back
+        // returns to the menu). Only plain page names, nothing with a path.
+        var startPage = decodeURIComponent((location.hash || "").slice(1));
+        loadContent(/^[a-z0-9]+\.html$/.test(startPage) ? startPage : "index2.html");
         window.addEventListener("message", function(event){ if (typeof handleAudioPlayerMessage === 'function') handleAudioPlayerMessage(event); }, false);
     }
 
