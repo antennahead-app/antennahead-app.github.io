@@ -83,6 +83,20 @@ a:hover { text-decoration: underline; }
 }
 .site-nav a:hover { background: var(--bg-3); color: var(--fg); text-decoration: none; }
 .site-nav a.active { color: var(--fg); background: var(--bg-3); }
+/* Below ~807 px (measured, with a scrollbar) the links no longer fit beside
+   the brand, and wrapping them inside the fixed-height bar spilled them over
+   the page. Instead: the brand on its own line, the links in one row
+   underneath that scrolls sideways (nav.js scrolls the current page's link
+   into view). 860 leaves room for wider fonts. */
+@media (max-width: 860px) {
+  .site-head .wrap { height: auto; flex-wrap: wrap; gap: 2px 18px; padding-top: 9px; }
+  .site-nav {
+    margin: 0 -20px; padding: 0 14px 7px; width: calc(100% + 40px);
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+  }
+  .site-nav::-webkit-scrollbar { display: none; }
+  .site-nav a { flex: none; white-space: nowrap; }
+}
 
 /* ---- hero ---- */
 .hero { padding: 76px 0 44px; }

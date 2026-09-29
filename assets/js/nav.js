@@ -9,6 +9,15 @@
     }
   });
 
+  // On phones the nav is one sideways-scrolling row; show the current page's
+  // link rather than always starting at Overview.
+  var nav = document.querySelector(".site-nav");
+  var active = nav && nav.querySelector("a.active");
+  if (active && nav.scrollWidth > nav.clientWidth) {
+    var linkBox = active.getBoundingClientRect(), navBox = nav.getBoundingClientRect();
+    nav.scrollLeft += linkBox.left - navBox.left - (nav.clientWidth - linkBox.width) / 2;
+  }
+
   // Fill any <span data-year> with the current year.
   document.querySelectorAll("[data-year]").forEach(function (el) {
     el.textContent = new Date().getFullYear();
