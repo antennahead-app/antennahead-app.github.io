@@ -246,6 +246,58 @@
     return s + "<br>&nbsp;<br></section></div>";
   }
 
+  /* Text to Speech page (devicetexttospeech.html). Mirrors
+     textToSpeechFormHTML() + speakTextFormHTML() in AntennaHeadHTTPServer.swift
+     with a sample folder; the Speak Text example and the markup guide below
+     are copied from that file's speakTextExample / speechMarkupHelpHTML. */
+  var SPEECH_MARKUP_HELP = "<details class='speech-markup-help'><summary>Controlling the voice: pauses, speed, pronunciation</summary>\n<p>There are two ways to control how the text is spoken, and they depend on the voice.</p>\n<p><strong>Modern voices</strong> (Ava, Samantha, Siri and other Premium/Enhanced voices): start the text with\n<code>&lt;speak&gt;</code> and end it with <code>&lt;/speak&gt;</code> to use SSML markup. Measured with the Premium Ava voice:</p>\n<table class='u-full-width'>\n<thead><tr><th>Markup</th><th>Effect</th></tr></thead>\n<tbody>\n<tr><td><code>&lt;prosody rate=\"50%\"&gt;&hellip;&lt;/prosody&gt;</code> (also <code>\"150%\"</code>, <code>\"slow\"</code>, <code>\"fast\"</code>)</td><td>\u2705 Speed. 50% took 3.7&nbsp;s where normal took 2.8&nbsp;s.</td></tr>\n<tr><td><code>&lt;break time=\"1500ms\"/&gt;</code></td><td>\u2705 A pause of that length.</td></tr>\n<tr><td><code>&lt;prosody volume=\"x-soft\"&gt;&hellip;&lt;/prosody&gt;</code></td><td>\u2705 Volume. <code>x-soft</code> is about a quarter as loud.</td></tr>\n<tr><td><code>&lt;say-as interpret-as=\"characters\"&gt;KHDX&lt;/say-as&gt;</code></td><td>\u2705 Spells it out letter by letter.</td></tr>\n<tr><td><code>&lt;phoneme alphabet=\"ipa\" ph=\"&hellip;\"&gt;word&lt;/phoneme&gt;</code></td><td>\u2705 Fixes a pronunciation, written in the IPA phonetic alphabet.</td></tr>\n<tr><td><code>&lt;prosody pitch=\"+40%\"&gt;&hellip;&lt;/prosody&gt;</code></td><td>\u26a0\ufe0f Changes the audio only slightly; the pitch barely moves.</td></tr>\n<tr><td><code>&lt;emphasis level=\"strong\"&gt;&hellip;&lt;/emphasis&gt;</code></td><td>\u274c Ignored.</td></tr>\n<tr><td><code>&lt;sub alias=\"North Little Rock\"&gt;NLR&lt;/sub&gt;</code></td><td>\u274c Ignored: still says the letters. Type the words out instead.</td></tr>\n</tbody></table>\n<p>If the markup can&rsquo;t be parsed (for example, a closing tag that doesn&rsquo;t match its opening tag),\nnothing is spoken at all and the log shows &ldquo;invalid SSML&rdquo;. A <code>&lt;voice name=\"&hellip;\"&gt;</code> tag inside the markup overrides the Voice menu.</p>\n<p><strong>Classic voices</strong> (names in the Voice menu such as Alex, Albert and Fred, whose identifiers start with\n<code>com.apple.speech.synthesis.voice.</code>) don&rsquo;t read SSML. Instead, put commands in double brackets\nin plain text:</p>\n<ul>\n<li><code>[[slnc 1500]]</code> &mdash; pause 1.5 seconds</li>\n<li><code>[[rate 120]]</code> &mdash; speed in words per minute</li>\n<li><code>[[pbas 40]]</code> &mdash; base pitch; <code>[[pmod 60]]</code> &mdash; how much the pitch varies</li>\n</ul>\n<p>Don&rsquo;t mix the two: modern voices read <code>[[&hellip;]]</code> commands out loud, and classic voices read SSML tags out loud.\nThe Voice menu&rsquo;s &ldquo;Default voice&rdquo; is the Text to Speech voice chosen in AntennaHead&rsquo;s Configuration tab.</p>\n</details>";
+  var SPEAK_TEXT_EXAMPLE = "&lt;speak&gt;It is four oh nine &lt;break time=\"700ms\"/&gt; &lt;prosody rate=\"80%\"&gt;on AntennaHead Radio.&lt;/prosody&gt;&lt;/speak&gt;";
+  var TTS_SAMPLE_FILES = [
+    ["announcement-welcome.txt", "1 KB", "Sep 20, 2026 at 9:14 AM"],
+    ["news-intro.txt", "2 KB", "Sep 22, 2026 at 6:02 PM"],
+    ["station-id.txt", "1 KB", "Sep 24, 2026 at 11:40 AM"],
+    ["weather-disclaimer.txt", "3 KB", "Sep 27, 2026 at 8:25 PM"]
+  ];
+  var TEXT_TO_SPEECH_FORM =
+    '<form class="text_to_speech_form" id="textToSpeechForm" onsubmit="event.preventDefault(); return false;" method="POST">' +
+    "<label>Text to Speech</label>" +
+    "<p>Speak the <code>.txt</code> files from a folder through the live audio pipeline " +
+    "(<code>PCMSpeechSynth</code> synthesizes each one in turn).</p>" +
+    '<div class="tts-select-actions">' +
+    '<input class="button" type="button" value="Select All" onclick="ttsSelectAllFiles(true);">' +
+    '<input class="button" type="button" value="Select None" onclick="ttsSelectAllFiles(false);"></div>' +
+    '<div class="scrolling-file-list"><table class="u-full-width">' +
+    "<thead><tr><th></th><th>Name</th><th>Date</th></tr></thead><tbody>" +
+    TTS_SAMPLE_FILES.map(function (f, i) {
+      return '<tr><td><input type="checkbox" class="tts-file-checkbox" id="tts-file-' + i + '" value="' + f[0] + '" checked></td>' +
+        '<td><label for="tts-file-' + i + '">' + f[0] + ' <span class="rec-size">(' + f[1] + ")</span></label></td>" +
+        "<td>" + f[2] + "</td></tr>";
+    }).join("") +
+    "</tbody></table></div>" +
+    '<label for="tts_sequence">Sequence</label>' +
+    '<select id="tts_sequence" name="tts_sequence" class="u-full-width">' +
+    '<option value="chronological">Chronological (oldest file first)</option>' +
+    '<option value="alphabetical">Alphabetical (by file name)</option>' +
+    '<option value="random">Random</option></select>' +
+    '<label for="tts_repeat"><input type="checkbox" id="tts_repeat" name="tts_repeat" value="1"> Repeat indefinitely</label>' +
+    '<br><br><input class="twelve columns button button-primary" type="button" value="Listen" ' +
+    "onclick=\"textToSpeechListenButtonClicked(getElementById('textToSpeechForm'));\">" +
+    "</form><br>&nbsp;<br>" +
+    '<form class="speak_text_form" id="speakTextForm" onsubmit="event.preventDefault(); return false;" method="POST">' +
+    '<label for="tts_speak_text">Speak Text</label>' +
+    "<p>Type text and speak it once through the live audio pipeline. Text that starts with " +
+    "<code>&lt;speak&gt;</code> is read as SSML markup (see below).</p>" +
+    '<textarea id="tts_speak_text" name="tts_speak_text" class="u-full-width" rows="6" ' +
+    'autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">' + SPEAK_TEXT_EXAMPLE + "</textarea>" +
+    '<label for="tts_speak_voice">Voice</label>' +
+    '<select id="tts_speak_voice" name="tts_speak_voice" class="u-full-width">' +
+    '<option value="" selected>Default voice</option>' +
+    "<option>Alex — en-US</option><option>Ava — en-US (Premium)</option>" +
+    "<option>Fred — en-US</option><option>Samantha — en-US (Enhanced)</option></select>" +
+    '<br><br><input class="twelve columns button button-primary" type="button" value="Speak" ' +
+    "onclick=\"speakTextButtonClicked(getElementById('speakTextForm'));\">" +
+    "</form><br>" + SPEECH_MARKUP_HELP + "<br>&nbsp;<br>";
+
   // "Listen to Gqrx" tile on the Radio page (the real app injects it when Gqrx
   // integration is enabled in Configuration).
   var GQRX_TILE =
@@ -296,7 +348,7 @@
     TUNER_FORM: NOT_IN_PREVIEW,
     DEVICES_FORM: NOT_IN_PREVIEW,
     GQRX_FORM: NOT_IN_PREVIEW,
-    TEXT_TO_SPEECH_FORM: NOT_IN_PREVIEW,
+    TEXT_TO_SPEECH_FORM: TEXT_TO_SPEECH_FORM,
     PLAY_AUDIO_FILES_FORM: NOT_IN_PREVIEW,
     SPEAK_RSS_HEADLINES_FORM: NOT_IN_PREVIEW,
     ADD_RSS_FEED_FORM: NOT_IN_PREVIEW,
@@ -392,7 +444,7 @@
       return { body: JSON.stringify({ seconds: audioDelay }) };
     }
 
-    if (method === "POST" && /(listenbuttonclicked|insertnewfrequency|storefrequency|deletefrequency|storecategory|addcategory|deletecategory|applyaacsettings|applywebuitheme|texttospeechchoosefolder)\.html$/.test(u)) {
+    if (method === "POST" && /(listenbuttonclicked|insertnewfrequency|storefrequency|deletefrequency|storecategory|addcategory|deletecategory|applyaacsettings|applywebuitheme|texttospeechchoosefolder|speaktextbuttonclicked)\.html$/.test(u)) {
       return { body: "", toast: "Preview only — this action needs the AntennaHead app" };
     }
     return null;
