@@ -169,12 +169,6 @@
     return '<embed class="value-img" type="image/svg+xml" src="images/' + name + '.svg" />';
   }
 
-  var CONTROLBOOTH_TILE =
-    '<div class="six columns value-prop">' + icon("controlbooth") +
-    '<div class="value-prop"><a class="button button-primary" ' +
-    'onclick="loadContent(\'controlbooth.html\');">' +
-    "ControlBooth</a></div>Start a ControlBooth pipeline<br>as the audio source</div>";
-
   /* ControlBooth pages. The real app renders these on the server
      (controlBoothPageHTML() in AntennaHeadHTTPServer.swift); these fixtures
      mirror its markup with sample data: the radio on the air, a few
@@ -324,7 +318,6 @@
     PLAY_AUDIO_FILES_ICON: icon("playaudiofiles"),
     SPEAK_RSS_HEADLINES_ICON: icon("rss"),
     LOCALRADIO_ANIMATION: icon("AntennaHead-animation"),
-    CONTROLBOOTH_TILE: CONTROLBOOTH_TILE,
     GQRX_TILE: GQRX_TILE,
 
     CATEGORIES_TABLE: CATEGORIES_TABLE,
