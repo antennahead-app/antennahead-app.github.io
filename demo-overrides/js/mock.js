@@ -76,8 +76,147 @@
     fir_size: 9,
     audio_output_filter: "vol 1",
     station_name: "KUAR-NPR Little Rock 89.1",
-    frequency: 89100000
+    frequency: 89100000,
+    gqrx: null   // set below, once GQRX exists
   };
+
+  /* Listen to Gqrx page. The real app serves gqrxFormHTML() (Gqrx running:
+     Quit buttons, the Listen form, and the hidden Remote Control panel from
+     gqrxControlPanelHTML()) and antennahead.js fills the panel from the
+     `gqrx` object of nowplayingstatus.html. Here the same markup is served
+     with Gqrx playing 89.1 MHz WFM (stereo), and the mock keeps GQRX as
+     mutable state so the sliders, Tune, Mute and bookmarks respond. */
+  var GQRX_BOOKMARK_ROWS = [
+    [88300000, "KABF 88.3 Little Rock", "WFM (stereo)", 160000, ["FM Broadcast"]],
+    [89100000, "KUAR-NPR Little Rock 89.1", "WFM (stereo)", 160000, ["FM Broadcast"]],
+    [90500000, "KLRE Classical Music 90.5", "WFM (stereo)", 160000, ["FM Broadcast"]],
+    [91300000, "KUCA 91.3 Conway", "WFM (stereo)", 240000, ["FM Broadcast"]],
+    [92300000, "KIPR 92.3 Little Rock", "WFM (stereo)", 170000, ["FM Broadcast"]],
+    [94100000, "KKPT 94.1 Little Rock", "WFM (stereo)", 160000, ["FM Broadcast"]],
+    [95700000, "KSSN 95.7 Little Rock", "WFM (stereo)", 160000, ["FM Broadcast"]],
+    [98500000, "KURB 98.5", "WFM (stereo)", 160000, ["FM Broadcast"]],
+    [103700000, "KABZ 103.7 Little Rock", "WFM (stereo)", 160000, ["FM Broadcast"]],
+    [107700000, "KLAL 107.7", "WFM (stereo)", 160000, ["FM Broadcast"]],
+    [118700000, "Adams ATC Tower", "AM", 10000, ["Aviation"]],
+    [118950000, "Adams Field Clearance Delivery", "AM", 10000, ["Aviation"]],
+    [119500000, "Adams Field Approach/Dep", "AM", 10000, ["Aviation"]],
+    [121500000, "Aviation Emergency", "AM", 10000, ["Aviation"]],
+    [121900000, "Adams Field Ground", "AM", 10000, ["Aviation"]],
+    [144390000, "CAREN APRS Digipeater", "Narrow FM", 10000, ["Untagged"]],
+    [147315000, "Skywarn Russell 147.315", "Narrow FM", 10000, ["NOAA"]],
+    [162400000, "NOAA KXI96 Russell 162.4", "Narrow FM", 10000, ["NOAA"]],
+    [162475000, "NOAA KXI95 Morrilton 162.475", "Narrow FM", 10000, ["NOAA"]],
+    [162525500, "NOAA WWF96 Russellville", "Narrow FM", 10000, ["NOAA"]],
+    [162550000, "NOAA WXJ55 Little Rock 162.55", "Narrow FM", 10000, ["NOAA"]]
+  ];
+  var GQRX_MODE_FOR = { "WFM (stereo)": "WFM_ST", "WFM (mono)": "WFM", "AM": "AM", "Narrow FM": "FM" };
+  var GQRX = {
+    available: true,
+    frequency: 89100000,
+    mode: "WFM_ST",
+    modes: ["OFF", "RAW", "AM", "AMS", "LSB", "USB", "CWL", "CWU", "FM", "WFM", "WFM_ST", "WFM_ST_OIRT"],
+    passband: 160000,
+    has_filter_shape: true, filter_shape: 1,
+    has_filter_offset: false, filter_offset: 0,
+    rf_gain_name: "LNA", rf_gain: 28,
+    af_gain: 0,
+    squelch: -146,
+    signal: -31,
+    muted: false,
+    udp_audio_running: true,
+    dsp_running: true,
+    has_device_control: true,
+    input_device: "rtl=0",
+    input_devices: ["Realtek RTL2838UHIDIR SN: 00000180", "Realtek RTL2838UHIDIR SN: 00000360"],
+    output_device: "Mac mini Speakers",
+    output_devices: ["Mac mini Speakers", "Default output"],
+    bookmarks: GQRX_BOOKMARK_ROWS.map(function (b) {
+      return { frequency: b[0], name: b[1], modulation: b[2], bandwidth: b[3], tags: b[4] };
+    })
+  };
+
+  var GQRX_FORM =
+    "<div class='gqrx-app-buttons'>" +
+    "<input class='button' type='button' value='Quit Gqrx' onclick='gqrxQuitApp(false);' title='Quit Gqrx, freeing the RTL-SDR it holds.'>" +
+    "<input class='button' type='button' value='Quit and Restart Gqrx' onclick='gqrxQuitApp(true);' title='Quit Gqrx and open it again — for when its audio is noise and the waterfall shows vertical streaks.'>" +
+    "</div>" +
+    "<form class='gqrx_form' id='gqrxForm' onsubmit='event.preventDefault(); return false;' method='POST'>" +
+    "<label>Listen to Gqrx</label>" +
+    "<p>Receiving on UDP port <strong>7355</strong> — set Gqrx's Audio ▸ UDP output to this port.</p>" +
+    "<label>Channels</label>" +
+    "<select class='u-full-width' name='gqrx_channels'>" +
+    "<option value='2'>2 – Stereo (Gqrx Audio ▸ Stereo checkbox enabled)</option>" +
+    "<option value='1'>1 – Mono</option></select>" +
+    "<input class='twelve columns button button-primary' type='button' value='Listen' onclick=\"gqrxListenButtonClicked(this.form);\" " +
+    "title='Receive Gqrx&#39;s UDP audio output (port 7355), normalize via sox, forward to LiveAudioServer.'>" +
+    "</form>" +
+    "<div id='gqrxPanel' class='gqrx-panel' hidden><hr><label>Gqrx Remote Control</label>" +
+    "<p id='gqrxStatus' class='gqrx-status'>Connecting…</p>" +
+    "<div class='gqrx-row'><input type='button' id='gqrxDsp' class='twelve columns button' value='Receiver' onclick='gqrxToggleDsp();'></div>" +
+    "<div class='gqrx-row' id='gqrxDevRow' hidden><label for='gqrxInDev'>SDR device</label>" +
+    "<select id='gqrxInDev' class='u-full-width' onchange='gqrxSendInDev();'></select>" +
+    "<p id='gqrxInDevCur' class='gqrx-status'></p>" +
+    "<label for='gqrxOutDev'>Audio output</label>" +
+    "<select id='gqrxOutDev' class='u-full-width' onchange='gqrxSendOutDev();'></select></div>" +
+    "<div class='gqrx-row'><label for='gqrxFreq'>Frequency (MHz)</label><div class='gqrx-inline'>" +
+    "<input type='number' id='gqrxFreq' step='0.001' class='gqrx-freq'>" +
+    "<input type='button' class='button' value='Tune' onclick='gqrxSetFreq();'></div></div>" +
+    "<div class='gqrx-row' id='gqrxOffsetRow' hidden><label for='gqrxOffset'>Channel offset (Hz)</label><div class='gqrx-inline'>" +
+    "<input type='number' id='gqrxOffset' step='100' class='gqrx-freq'>" +
+    "<input type='button' class='button' value='Set' onclick='gqrxSetOffset();'></div></div>" +
+    "<div class='gqrx-row'><label for='gqrxMode'>Mode</label>" +
+    "<select id='gqrxMode' class='u-full-width' onchange='gqrxSendMode();'></select></div>" +
+    "<div class='gqrx-row'><label for='gqrxWidth'>Filter width <span id='gqrxWidthVal' class='gqrx-val'></span></label>" +
+    "<input type='range' id='gqrxWidth' min='500' max='250000' step='100' class='u-full-width' oninput='gqrxWidthInput();' onchange='gqrxSendMode();'></div>" +
+    "<div class='gqrx-row' id='gqrxShapeRow' hidden><label for='gqrxShape'>Filter shape</label>" +
+    "<select id='gqrxShape' class='u-full-width' onchange='gqrxSendShape();'>" +
+    "<option value='0'>Soft</option><option value='1'>Normal</option><option value='2'>Sharp</option></select></div>" +
+    "<div class='gqrx-row' id='gqrxRFRow' hidden><label for='gqrxRF'><span id='gqrxRFName'>RF</span> gain <span id='gqrxRFVal' class='gqrx-val'></span></label>" +
+    "<input type='range' id='gqrxRF' min='0' max='50' step='0.1' class='u-full-width' oninput='gqrxRFInput();' onchange='gqrxSendRF();'></div>" +
+    "<div class='gqrx-row'><label for='gqrxAF'>Audio gain <span id='gqrxAFVal' class='gqrx-val'></span> dB</label>" +
+    "<input type='range' id='gqrxAF' min='-40' max='40' step='1' class='u-full-width' oninput='gqrxAFInput();' onchange='gqrxSendAF();'></div>" +
+    "<div class='gqrx-row'><label for='gqrxSql'>Squelch <span id='gqrxSqlVal' class='gqrx-val'></span> dBFS</label>" +
+    "<input type='range' id='gqrxSql' min='-150' max='0' step='1' class='u-full-width' oninput='gqrxSqlInput();' onchange='gqrxSendSql();'></div>" +
+    "<div class='gqrx-row'><label>Signal <span id='gqrxSig' class='gqrx-val'>–</span> dBFS</label>" +
+    "<div class='gqrx-meter'><div id='gqrxSigBar' class='gqrx-meter-fill'></div></div></div>" +
+    "<div class='gqrx-row'><label class='gqrx-check'><input type='checkbox' id='gqrxMute' onchange='gqrxToggleMute();'> Mute Gqrx audio</label></div>" +
+    "<div class='gqrx-row'><label class='gqrx-check'><input type='checkbox' id='gqrxUdpAudio' onchange='gqrxToggleUdpAudio();'> Start UDP Audio (port 7355)</label></div>" +
+    "<div class='gqrx-row' id='gqrxBookmarksRow' hidden><label>Bookmarks</label>" +
+    "<input type='text' id='gqrxBmFilter' class='u-full-width' placeholder='filter by name or tag…' oninput='gqrxRenderBookmarks();'>" +
+    "<div id='gqrxBookmarks' class='gqrx-bookmarks'></div></div>" +
+    "</div><br>&nbsp;<br>";
+
+  /* The /gqrx*.html POSTs mutate GQRX so the panel behaves like the real one. */
+  function gqrxMock(u, body) {
+    var f = {};
+    try { JSON.parse(body || "[]").forEach(function (o) { f[o.name] = o.value; }); } catch (e) {}
+    if (/gqrxsetfrequency\.html$/.test(u)) GQRX.frequency = Number(f.freq) || GQRX.frequency;
+    else if (/gqrxsetmode\.html$/.test(u)) { GQRX.mode = f.mode || GQRX.mode; GQRX.passband = Number(f.passband) || GQRX.passband; }
+    else if (/gqrxsetshape\.html$/.test(u)) GQRX.filter_shape = Number(f.shape);
+    else if (/gqrxsetlevel\.html$/.test(u)) {
+      if (f.name === "AF") GQRX.af_gain = Number(f.value);
+      else if (f.name === "SQL") GQRX.squelch = Number(f.value);
+      else GQRX.rf_gain = Number(f.value);
+    }
+    else if (/gqrxmute\.html$/.test(u)) GQRX.muted = f.on === "1";
+    else if (/gqrxsetudpaudio\.html$/.test(u)) GQRX.udp_audio_running = f.on === "1";
+    else if (/gqrxsetdsp\.html$/.test(u)) GQRX.dsp_running = f.on === "1";
+    else if (/gqrxbookmark\.html$/.test(u)) {
+      var hz = Number(f.freq);
+      GQRX.bookmarks.forEach(function (b) {
+        if (b.frequency === hz) {
+          GQRX.frequency = hz; GQRX.passband = b.bandwidth;
+          GQRX.mode = GQRX_MODE_FOR[b.modulation] || GQRX.mode;
+        }
+      });
+      NOW_PLAYING_STATUS.frequency = GQRX.frequency;
+    }
+    else if (/(quitgqrx|restartgqrx|quitgqrxandretry)\.html$/.test(u)) return { body: "", toast: "Preview only — this needs Gqrx on the Mac" };
+    else return null;
+    return { body: "" };
+  }
+
+  NOW_PLAYING_STATUS.gqrx = GQRX;
 
   var CATEGORIES_TABLE =
     '<table class="u-full-width"><thead><tr><th>Category</th><th>Stations</th><th></th></tr></thead><tbody>' +
@@ -340,7 +479,7 @@
 
     TUNER_FORM: NOT_IN_PREVIEW,
     DEVICES_FORM: NOT_IN_PREVIEW,
-    GQRX_FORM: NOT_IN_PREVIEW,
+    GQRX_FORM: GQRX_FORM,
     TEXT_TO_SPEECH_FORM: TEXT_TO_SPEECH_FORM,
     PLAY_AUDIO_FILES_FORM: NOT_IN_PREVIEW,
     SPEAK_RSS_HEADLINES_FORM: NOT_IN_PREVIEW,
@@ -421,7 +560,11 @@
       return { body: "", toast: "Preview only — this needs ControlBooth on the Mac" };
     }
 
-    if (/nowplayingstatus\.html$/.test(u)) return { body: JSON.stringify(NOW_PLAYING_STATUS) };
+    if (method === "POST") { var gm = gqrxMock(u, body); if (gm) return gm; }
+    if (/nowplayingstatus\.html$/.test(u)) {
+      GQRX.signal = -31 + Math.round((Math.random() * 6 - 3) * 10) / 10;   // the meter moves a little, like a live signal
+      return { body: JSON.stringify(NOW_PLAYING_STATUS) };
+    }
     if (/rtlsdrdevices\.html$/.test(u)) return { body: JSON.stringify(["RTL2838 (00000001)"]) };
     if (/api\/aac-recorder\/status$/.test(u)) return { body: JSON.stringify({ recording: false, elapsed: 0 }) };
     if (/api\/aac-recorder\/(start|stop)$/.test(u)) return { body: JSON.stringify({ recording: false, elapsed: 0 }), toast: "Preview only — recorder needs the app" };
@@ -442,6 +585,27 @@
     }
     return null;
   }
+
+  /* The real app polls nowplayingstatus.html every second or so, which is
+     what fills and refreshes the Gqrx remote-control panel. Polling is off in
+     this preview, so poll only while that panel is on screen. A new panel
+     element means a fresh visit to the page: reset antennahead.js's
+     "populate once" flags first, as the app's index.html does on navigation. */
+  var gqrxPanelSeen = null;
+  setInterval(function () {
+    var panel = document.getElementById("gqrxPanel");
+    if (!panel) { gqrxPanelSeen = null; return; }
+    if (panel !== gqrxPanelSeen) {
+      gqrxPanelSeen = panel;
+      if (typeof gqrxResetPanelState === "function") gqrxResetPanelState();
+    }
+    var x = new XMLHttpRequest();
+    x.open("POST", "nowplayingstatus.html", true);
+    x.onload = function () {
+      try { gqrxUpdatePanel(JSON.parse(x.responseText).gqrx); } catch (e) {}
+    };
+    x.send();
+  }, 1000);
 
   XMLHttpRequest.prototype.open = function (method, url) {
     this.__m = method;
