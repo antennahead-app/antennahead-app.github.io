@@ -12,7 +12,7 @@ the site first and add clips later.
 | `antennahead-gqrx.mp4`            | antennahead.html | portrait 9:16 | 15–30 s |
 | `antennahead-audio-delay.mp4`     | antennahead.html | portrait 9:16 | 15–30 s |
 | `antennahead-scanner.mp4`         | antennahead.html | portrait 9:16 | 15–30 s |
-| `antennahead-gqrx-watch.mp4`      | rtl-sdr.html | Apple Watch 416x496 | ~55 s |
+| `antennahead-gqrx-watch.mp4`      | rtl-sdr.html | Apple Watch 416x496 | ~75 s |
 | `controlbooth-build-pipeline.mp4` | controlbooth.html | landscape 16:9 | 20–40 s |
 | `controlbooth-scheduled-recording.mp4` | controlbooth.html | landscape 16:9 | 20–40 s |
 
