@@ -23,6 +23,16 @@
     el.textContent = new Date().getFullYear();
   });
 
+  // Scale the simulated iPhone's 390 px-wide iframe to the frame's width.
+  document.querySelectorAll(".phone .screen").forEach(function (screen) {
+    var fit = function () {
+      screen.style.setProperty("--phone-scale", screen.clientWidth / 390);
+    };
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(screen);
+    else window.addEventListener("resize", fit);
+  });
+
   // Replace a <video> with a friendly placeholder if its source 404s, so the
   // page still reads well before the demo clips are dropped in.
   document.querySelectorAll("figure.clip video").forEach(function (v) {

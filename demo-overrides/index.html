@@ -125,8 +125,8 @@
         display: flex;
         align-items: center;
         height: 50px;
-        padding: 0 10px;
-        gap: 10px;
+        padding: 0 8px;
+        gap: 6px;
         font-family: "Raleway", "HelveticaNeue", Helvetica, Arial, sans-serif;
     }
     #navigationbar .navbtn {
@@ -134,7 +134,7 @@
         border: 1px solid rgba(0,0,0,0.2);
         background: rgba(255,255,255,0.6);
         border-radius: 6px;
-        padding: 4px 10px;
+        padding: 4px 8px;
         font-size: 13px;
         line-height: 1;
         cursor: pointer;
@@ -143,12 +143,16 @@
     }
     #navigationbar .navbtn:active { background: rgba(0,0,0,0.08); }
     #navigationbar .navtitle {
-        flex: 1 1 auto;
+        flex: 1 1 0;
+        min-width: 0;            /* let the title shrink so the bar fits a 390 px phone */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         text-align: center;
         font-weight: 600;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.03em;
         text-transform: uppercase;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     /* preview ribbon injected by mock.js */
