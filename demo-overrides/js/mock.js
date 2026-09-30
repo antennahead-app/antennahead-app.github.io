@@ -297,6 +297,55 @@
     '<option value="2">NOAA Weather</option>' +
     '<option value="3">Airband — KLIT</option></select>';
 
+  /* Advanced Tuner page: the markup of the app's newFrequencyFormHTML() with
+     the new-frequency defaults (Frequency.prototype()). The USB Device combo
+     box's <datalist> is filled from the app's device list there; here it lists
+     the one sample dongle. */
+  var TUNER_FORM = (function () {
+    function text(label, name, value, type, step, list) {
+      return "<label for='" + name + "'>" + label + "</label><input class='twelve columns value-prop' type='" + (type || "text") + "' " +
+        "autocomplete='off' autocorrect='off' autocapitalize='none' spellcheck='false' id='" + name + "' name='" + name + "' value='" + value + "'" +
+        (step ? " step='" + step + "'" : "") + (list ? " list='" + list + "'" : "") + ">";
+    }
+    function select(label, name, current, options) {
+      var h = "<label for='" + name + "'>" + label + "</label><select class='twelve columns value-prop' name='" + name + "'>";
+      options.forEach(function (o) {
+        h += "<option value='" + o[0] + "'" + (o[0] === current ? " selected" : "") + ">" + o[1] + "</option>";
+      });
+      return h + "</select>";
+    }
+    var onOff = [["0", "Off"], ["1", "On"]];
+    var mods = ["fm", "nfm", "wfm", "am", "usb", "lsb", "raw"].map(function (m) { return [m, m.toUpperCase()]; });
+    var h = "<form class='wbfm-tuner-form' id='tuner-advanced-form' onsubmit='event.preventDefault(); return insertNewFrequencyRecord(this);' method='POST'>";
+    h += text("Station Name:", "station_name", "");
+    h += text("Frequency (Hz):", "frequency", "89100000", "number");
+    h += select("Modulation:", "modulation", "fm", mods);
+    h += select("FM Stereo:", "stereo_flag", "0", onOff);
+    h += text("Sample Rate:", "sample_rate", "170000", "number");
+    h += text("Tuner Gain:", "tuner_gain", "49.5", "number", "0.1");
+    h += select("Tuner AGC:", "tuner_agc", "0", onOff);
+    h += select("Sampling Mode:", "sampling_mode", "0", [["0", "Standard"], ["1", "Direct Sampling (I)"], ["2", "Direct Sampling (Q)"]]);
+    h += text("Oversampling:", "oversampling", "4", "number");
+    h += text("Squelch Level:", "squelch_level", "0.0", "number", "0.1");
+    h += text("FIR Size:", "fir_size", "9", "number");
+    h += text("atan Math:", "atan_math", "std");
+    h += text("Audio Output Filter:", "audio_output_filter", "vol 1");
+    h += text("rtl_fm Options:", "options", "");
+    h += text("USB Device (serial number or index):", "usb_device_string", "", "text", null, "usb_device_datalist");
+    h += "<datalist id='usb_device_datalist'><option value='00000001'>RTL2838 (00000001)</option></datalist>";
+    h += select("Bias-T Power:", "bias_t_flag", "0", onOff);
+    h += "<label for='categories_select'>Category:</label>" +
+      "<select class='twelve columns value-prop' name='categories_select' title='The Category pop-up button can be used when adding a new Favorites frequency record'>" +
+      "<option value='' selected></option><option value='1'>Little Rock FM</option><option value='2'>NOAA Weather</option>" +
+      "<option value='3'>Airband — KLIT</option></select>";
+    h += "<br>&nbsp;<br>&nbsp;<br>";
+    h += "<input class='twelve columns button button-primary' type='button' value='Listen' onclick='advancedListenButtonClicked(this.form);' " +
+      "title='Tune the RTL-SDR radio to the frequency and settings above.'>";
+    h += "<br>&nbsp;<br>&nbsp;<br>";
+    h += "<input class='twelve columns button button-primary' type='submit' value='Add New Favorite Frequency'>";
+    return h + "</form>";
+  })();
+
   var NOT_IN_PREVIEW =
     '<div style="max-width:520px;margin:1.5rem auto;padding:1rem 1.25rem;border:1px solid #d9b7b2;' +
     'border-radius:8px;background:#faf1f0;color:#7a2c22;text-align:left">' +
@@ -477,7 +526,7 @@
     WEB_UI_THEME_SELECT: WEB_UI_THEME_SELECT,
     CATEGORY_SELECT: CATEGORY_SELECT,
 
-    TUNER_FORM: NOT_IN_PREVIEW,
+    TUNER_FORM: TUNER_FORM,
     DEVICES_FORM: NOT_IN_PREVIEW,
     GQRX_FORM: GQRX_FORM,
     TEXT_TO_SPEECH_FORM: TEXT_TO_SPEECH_FORM,
