@@ -218,22 +218,6 @@
 
   NOW_PLAYING_STATUS.gqrx = GQRX;
 
-  var CATEGORIES_TABLE =
-    '<table class="u-full-width"><thead><tr><th>Category</th><th>Stations</th><th></th></tr></thead><tbody>' +
-    row3("Little Rock FM", "6", "categories.html") +
-    row3("NOAA Weather", "3", "categories.html") +
-    row3("Airband — KLIT", "5", "categories.html") +
-    row3("Ham 2 m", "4", "categories.html") +
-    "</tbody></table>";
-
-  var FAVORITES_TABLE =
-    '<table class="u-full-width"><thead><tr><th>Station</th><th>Frequency</th><th></th></tr></thead><tbody>' +
-    fav("KUAR-NPR Little Rock", "89.1 MHz") +
-    fav("KABF Community Radio", "88.3 MHz") +
-    fav("KLRE Classical", "90.5 MHz") +
-    fav("NOAA Weather LZK", "162.550 MHz") +
-    "</tbody></table>";
-
   var SCANNER_CATEGORIES_TABLE =
     '<table class="u-full-width"><thead><tr><th>Category</th><th>Channels</th><th></th></tr></thead><tbody>' +
     row3("NOAA Weather", "7", "scannercategories.html") +
@@ -345,6 +329,273 @@
     h += "<input class='twelve columns button button-primary' type='submit' value='Add New Favorite Frequency'>";
     return h + "</form>";
   })();
+
+  /* ---- Favorites, categories and RSS feeds (Try-it pages) --------------
+     Sample records for the pages that show one record by id. The markup
+     mirrors the app's generators in AntennaHeadHTTPServer.swift:
+     favoritesTableHTML / categoriesTableHTML / viewFavorite / editFavorite /
+     categoryFavoritesTableHTML / editCategoryTableHTML /
+     editCategorySettingsFormHTML / editRSSFeed / speakRSSHeadlinesFormHTML.
+     `cur` holds the id from the fragment URL last requested (mockFor sets
+     it), so each page shows the right record. */
+  var cur = { fav: 1, cat: 1, feed: 1 };
+  var FAVS = [
+    { id: 1, name: "KUAR-NPR Little Rock 89.1", hz: 89100000, mod: "fm", stereo: 1, rate: 170000, gain: 49.6, agc: 0 },
+    { id: 2, name: "KABF Community Radio 88.3", hz: 88300000, mod: "fm", stereo: 1, rate: 170000, gain: 49.6, agc: 0 },
+    { id: 3, name: "KLRE Classical 90.5", hz: 90500000, mod: "fm", stereo: 1, rate: 170000, gain: 49.6, agc: 0 },
+    { id: 4, name: "NOAA Weather LZK", hz: 162550000, mod: "fm", stereo: 0, rate: 24000, gain: 49.6, agc: 0 },
+    { id: 5, name: "Adams Field Approach", hz: 119500000, mod: "am", stereo: 0, rate: 12000, gain: 49.6, agc: 1 },
+    { id: 6, name: "Adams Field Tower", hz: 118700000, mod: "am", stereo: 0, rate: 12000, gain: 49.6, agc: 1 },
+    { id: 7, name: "Ham 2 m Simplex", hz: 146520000, mod: "fm", stereo: 0, rate: 24000, gain: 0, agc: 0 },
+    { id: 8, name: "Skywarn Russell 147.315", hz: 147315000, mod: "fm", stereo: 0, rate: 24000, gain: 0, agc: 0 }
+  ];
+  var CATS = [
+    { id: 1, name: "Little Rock FM", scan: 1, mod: "fm", rate: 170000, members: [1, 2, 3] },
+    { id: 2, name: "NOAA Weather", scan: 1, mod: "fm", rate: 24000, members: [4] },
+    { id: 3, name: "Airband — KLIT", scan: 1, mod: "am", rate: 12000, members: [5, 6] },
+    { id: 4, name: "Ham 2 m", scan: 0, mod: "fm", rate: 24000, members: [7, 8] }
+  ];
+  var FEEDS = [
+    { id: 1, name: "NPR News", url: "https://feeds.npr.org/1001/rss.xml", voice: "", mode: "title" },
+    { id: 2, name: "BBC World Service", url: "https://feeds.bbci.co.uk/news/world/rss.xml", voice: "ava", mode: "title_and_summary" },
+    { id: 3, name: "NOAA Weather Alerts", url: "https://alerts.weather.gov/cap/ar.php?x=0", voice: "", mode: "title" }
+  ];
+  var VOICES = [
+    ["", "Default voice"], ["alex", "Alex — en-US"], ["ava", "Ava — en-US (Premium)"],
+    ["fred", "Fred — en-US"], ["samantha", "Samantha — en-US (Enhanced)"]
+  ];
+  var VERBATIM = "autocomplete='off' autocorrect='off' autocapitalize='none' spellcheck='false'";
+  var MODS = ["fm", "nfm", "wfm", "am", "usb", "lsb", "raw"];
+  var ON_OFF = [["0", "Off"], ["1", "On"]];
+  var SAMPLING = [["0", "Standard"], ["1", "Direct Sampling (I)"], ["2", "Direct Sampling (Q)"]];
+
+  function byId(list, id) {
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return list[0];
+  }
+  function mhz(hz) { return (hz / 1e6).toFixed(3) + " MHz"; }
+  function voiceSelect(id, current) {
+    var h = "<select id='" + id + "' name='" + id + "' class='u-full-width'>";
+    VOICES.forEach(function (v) { h += "<option value='" + v[0] + "'" + (v[0] === current ? " selected" : "") + ">" + v[1] + "</option>"; });
+    return h + "</select>";
+  }
+  function selectOpts(options, current) {
+    return options.map(function (o) {
+      return "<option value='" + o[0] + "'" + (o[0] === current ? " selected" : "") + ">" + o[1] + "</option>";
+    }).join("");
+  }
+  var MOD_OPTS = MODS.map(function (m) { return [m, m.toUpperCase()]; });
+  /* Two label styles, as in the app: the add/tuner form's block labels, and the
+     edit forms' wrapping labels. */
+  function blockText(label, name, value, type, step, list) {
+    return "<label for='" + name + "'>" + label + "</label><input class='twelve columns value-prop' type='" + (type || "text") + "' " + VERBATIM +
+      " id='" + name + "' name='" + name + "' value='" + value + "'" + (step ? " step='" + step + "'" : "") + (list ? " list='" + list + "'" : "") + ">";
+  }
+  function blockSelect(label, name, current, options) {
+    return "<label for='" + name + "'>" + label + "</label><select class='twelve columns value-prop' name='" + name + "'>" + selectOpts(options, current) + "</select>";
+  }
+  function wrapText(label, name, value, elementId, type, step, list) {
+    return "<label>" + label + "<input class='u-full-width' type='" + (type || "text") + "'" + (elementId ? " id='" + elementId + "'" : "") + " " + VERBATIM +
+      " name='" + name + "' value='" + value + "'" + (step ? " step='" + step + "'" : "") + (list ? " list='" + list + "'" : "") + "></label>";
+  }
+  function wrapSelect(label, name, current, options) {
+    return "<label>" + label + "<select class='u-full-width' name='" + name + "'>" + selectOpts(options, current) + "</select></label>";
+  }
+  var USB_DATALIST = "<datalist id='usb_device_datalist'><option value='00000001'>RTL2838 (00000001)</option></datalist>";
+
+  var FAVORITES_TABLE_REAL =
+    "<table class='u-full-width'><thead><tr><th>Frequency</th><th>Name</th></tr></thead><tbody>" +
+    FAVS.map(function (f) {
+      return "<tr><td><a class='button button-primary two columns' type='submit' onclick=\"loadContent('viewfavorite.html?id=" + f.id + "');\" " +
+        "title='Show " + f.name + " at " + mhz(f.hz) + "'>" + mhz(f.hz) + "</a></td><td>" + f.name + "</td></tr>";
+    }).join("") + "</tbody></table>";
+  var CATEGORIES_TABLE_REAL =
+    "<table class='u-full-width'><thead><tr><th>ID</th><th>Category</th></tr></thead><tbody>" +
+    CATS.map(function (c) {
+      return "<tr><td><a class='button button-primary' type='submit' onclick=\"loadContent('category.html?id=" + c.id + "');\" " +
+        "title='Show category " + c.name + "'>" + c.id + "</a></td><td>" + c.name + "</td></tr>";
+    }).join("") + "</tbody></table>" +
+    "<br><input class='twelve columns button button-primary' type='button' value='Add New Category' onclick=\"loadContent('addcategoryform.html');\">";
+
+  function catNavButton(page, label) {
+    return "<input class='button twelve columns' type='button' value='" + label + "' onclick=\"loadContent('" + page + "?id=" + cur.cat + "');\"><br>&nbsp;<br>\n";
+  }
+  function categoryFavoritesTable() {
+    var c = byId(CATS, cur.cat);
+    return "<table class='u-full-width'><thead><tr><th>Frequency</th><th>Name</th></tr></thead><tbody>" +
+      c.members.map(function (id) {
+        var f = byId(FAVS, id);
+        return "<tr><td><a class='button button-primary two columns' type='submit' onclick=\"loadContent('viewfavorite.html?id=" + f.id + "');\">" + mhz(f.hz) +
+          "</a></td><td>" + f.name + "</td></tr>";
+      }).join("") + "</tbody></table>";
+  }
+  function editCategoryTable() {
+    var c = byId(CATS, cur.cat);
+    return "<table class='u-full-width'><thead><tr><th>ID</th><th>Frequency</th><th>Name</th></tr></thead><tbody>" +
+      FAVS.map(function (f) {
+        var member = c.members.indexOf(f.id) >= 0;
+        return "<tr><td><input type='checkbox' class='checkbox' onclick='handleEditCategoryClick(this);' cat_id='" + c.id + "' freq_id='" + f.id + "'" +
+          (member ? " checked" : "") + "></td><td>" + mhz(f.hz) + "</td><td>" + f.name + "</td></tr>";
+      }).join("") + "</tbody></table>";
+  }
+  function deleteCategoryButton() {
+    var c = byId(CATS, cur.cat), label = c.name.length > 25 ? c.name.slice(0, 25) + "..." : c.name;
+    return "<form class='delete-favorite-form' id='delete-favorite-form' onsubmit='event.preventDefault(); return deleteCategoryRecord(this);' method='POST'>\n" +
+      "<br>&nbsp;<br>&nbsp;<br>\n<input id='delete-category-button' class='twelve columns button button-primary' type='submit' value='Delete " + label + " Category'>\n" +
+      "<input type='hidden' id='category_id' name='category_id' value='" + c.id + "'>\n<input type='hidden' id='category_name' name='category_name' value='" + c.name + "'>\n" +
+      "</form>\n<br>&nbsp;<br>\n";
+  }
+  function scanCategoryButton() {
+    var c = byId(CATS, cur.cat);
+    if (!c.scan) return "";
+    return "<form id='scannerlistenForm' action='#'><input type='hidden' name='id' value='" + c.id + "'>" +
+      "<br><input class='twelve columns button button-primary' type='button' value='Scan All Frequencies' onclick=\"scannerListenButtonClicked(scannerlistenForm);\">" +
+      "</form><br>&nbsp;<br>\n";
+  }
+  function editCategorySettingsForm() {
+    var c = byId(CATS, cur.cat);
+    return "<form class='editcategorysettings' id='editcategorysettings' onsubmit='event.preventDefault(); return storeCategoryRecord(this);' method='POST'>" +
+      blockText("Name:", "category_name", c.name) +
+      blockSelect("Enable Category Scanning:", "category_scanning_enabled", String(c.scan), [["0", "Disabled"], ["1", "Enabled"]]) +
+      blockText("USB Device (serial number or index):", "scan_usb_device_string", "", "text", null, "usb_device_datalist") + USB_DATALIST +
+      blockText("Tuner Gain:", "scan_tuner_gain", "49.5", "number", "0.1") +
+      blockSelect("Tuner AGC:", "scan_tuner_agc", "0", ON_OFF) +
+      blockText("Sample Rate:", "scan_sample_rate", String(c.rate), "number") +
+      blockSelect("Sampling Mode:", "scan_sampling_mode", "0", SAMPLING) +
+      blockText("Oversampling:", "scan_oversampling", "4", "number") +
+      blockSelect("Modulation:", "scan_modulation", c.mod, MOD_OPTS) +
+      blockText("Squelch Level:", "scan_squelch_level", "25.0", "number", "0.1") +
+      blockText("Squelch Delay:", "scan_squelch_delay", "10.0", "number", "0.1") +
+      blockText("RTL-FM Options:", "scan_options", "") +
+      blockText("FIR Size:", "scan_fir_size", "9", "number") +
+      blockText("atan Math:", "scan_atan_math", "std") +
+      blockText("Sox Audio Output Filter:", "scan_audio_output_filter", "vol 1") +
+      blockSelect("Bias-T Power:", "scan_bias_t_flag", "0", ON_OFF) +
+      "<input type='hidden' name='id' value='" + c.id + "'>" +
+      "<br>&nbsp;<br>&nbsp;<br><input class='twelve columns button button-primary' type='submit' value='Save Changes'></form><br>&nbsp;<br>&nbsp;";
+  }
+
+  function gainLabel(g, agc) {
+    var base = g <= 0 ? "auto" : (g % 1 === 0 ? g + " dB" : g + " dB");
+    return agc ? base + ", AGC on" : base;
+  }
+  function viewFavoriteItem() {
+    var f = byId(FAVS, cur.fav), mod = (f.mod === "fm" && f.stereo) ? "fm stereo" : f.mod;
+    var ch = ((f.mod === "fm" || f.mod === "wfm") && f.stereo && f.rate > 106000) ? "2 (stereo)" : "1 (mono)";
+    return "<form id='listenForm' action='#'><input type='hidden' name='id' value='" + f.id + "'>" +
+      "<br><br><input class='twelve columns button button-primary' type='button' value='Listen' " +
+      "onclick=\"var listenForm=getElementById('listenForm'); listenButtonClicked(listenForm);\" title='Click Listen to tune the RTL-SDR radio to this frequency.'></form>" +
+      "<input class='twelve columns button' type='button' value='Edit' onclick=\"loadContent('editfavorite.html?id=" + f.id + "');\" title='Click Edit to modify this favorite.'>" +
+      "<br><br>frequency: " + mhz(f.hz) + "<br>modulation: " + mod + "<br>sample rate: " + f.rate + "<br>device: 0<br>gain: " + gainLabel(f.gain, f.agc) +
+      "<br>channels: " + ch + "<br><br>";
+  }
+  function editFavoriteForm() {
+    var f = byId(FAVS, cur.fav);
+    return "<form id='editFrequencyForm' onsubmit=\"event.preventDefault(); return storeFrequencyRecord(this);\" method='POST'>" +
+      "<input type='hidden' name='id' value='" + f.id + "'>" +
+      wrapText("Station Name", "station_name", f.name, "frequency_name") +
+      wrapText("Frequency (Hz)", "frequency", String(f.hz), null, "number") +
+      wrapSelect("Frequency Mode", "frequency_mode", "frequency_mode_single", [["frequency_mode_single", "Single Frequency"], ["frequency_mode_range", "Scan Range"]]) +
+      wrapText("Scan Range End (Hz)", "frequency_scan_end", "0", null, "number") +
+      wrapText("Scan Range Interval (Hz)", "frequency_scan_interval", "0", null, "number") +
+      wrapText("Scan Range Squelch Delay", "frequency_scan_squelch_delay", "0.0", null, "number", "0.1") +
+      wrapSelect("Modulation", "modulation", f.mod, MOD_OPTS) +
+      wrapSelect("FM Stereo", "stereo_flag", String(f.stereo), ON_OFF) +
+      wrapText("Sample Rate", "sample_rate", String(f.rate), null, "number") +
+      wrapText("Tuner Gain", "tuner_gain", String(f.gain), null, "number", "0.1") +
+      wrapSelect("Tuner AGC", "tuner_agc", String(f.agc), ON_OFF) +
+      wrapSelect("Sampling Mode", "sampling_mode", "0", SAMPLING) +
+      wrapText("Oversampling", "oversampling", "4", null, "number") +
+      wrapText("Squelch Level", "squelch_level", "0.0", null, "number", "0.1") +
+      wrapText("FIR Size", "fir_size", "9", null, "number") +
+      wrapText("Atan Math", "atan_math", "std") +
+      wrapText("Audio Output Filter", "audio_output_filter", "vol 1") +
+      wrapText("rtl_fm Options", "options", "") +
+      wrapText("USB Device (serial number or index)", "usb_device_string", "", null, "text", null, "usb_device_datalist") + USB_DATALIST +
+      wrapSelect("Bias-T Power", "bias_t_flag", "0", ON_OFF) +
+      "<br><br><input class='button button-primary' type='submit' value='Save'> " +
+      "<input class='button' type='button' value='Delete' onclick='deleteFrequencyRecord(this.form);'></form>";
+  }
+
+  var DEVICES_FORM_FIXTURE =
+    "<form class='device_form' id='deviceForm' onsubmit='event.preventDefault(); return false;' method='POST'>" +
+    "<label for='audio_input'>Select Audio Input:</label>" +
+    "<select name='audio_input' class='twelve columns value-prop' title='Selects a Core Audio input device, like &quot;Built-in Microphone&quot;.'>" +
+    "<option value='Built-in Microphone'>Built-in Microphone</option><option value='USB Audio CODEC'>USB Audio CODEC</option>" +
+    "<option value='Loopback Audio'>Loopback Audio</option></select>" +
+    "<label for='audio_output_filter'>Sox Audio Output Filter:</label>" +
+    "<input class='twelve columns value-prop' type='text' " + VERBATIM + " id='audio_output_filter' name='audio_output_filter' value='vol 4' " +
+    "title='Applied by the Sox audio tool to the final output. Default &quot;vol 4&quot;. Do not set a &quot;rate&quot; here — the sample rate is fixed at 48000.'>" +
+    "<br><br><input class='twelve columns button button-primary' type='button' value='Listen' onclick=\"deviceListenButtonClicked(getElementById('deviceForm'));\" " +
+    "title='Listen to the selected audio input device.'></form><br>&nbsp;<br>";
+
+  var PAF_SAMPLE_FILES = [
+    ["jazz-set-01.mp3", "8.4 MB", "Sep 18, 2026 at 7:30 PM"],
+    ["morning-news-bumper.m4a", "412 KB", "Sep 21, 2026 at 6:05 AM"],
+    ["station-ident.aac", "96 KB", "Sep 24, 2026 at 11:42 AM"],
+    ["weekend-mix.mp3", "21.7 MB", "Sep 27, 2026 at 9:00 PM"]
+  ];
+  var PLAY_AUDIO_FILES_FORM_FIXTURE =
+    "<form class='play_audio_files_form' id='playAudioFilesForm' onsubmit='event.preventDefault(); return false;' method='POST'>" +
+    "<label>Play Audio Files</label>" +
+    "<p>Play the audio files from a folder through the live audio pipeline (<code>PCMFilePlayer</code> decodes each one in turn).</p>" +
+    "<div class='tts-select-actions'><input class='button' type='button' value='Select All' onclick='pafSelectAllFiles(true);'>" +
+    "<input class='button' type='button' value='Select None' onclick='pafSelectAllFiles(false);'></div>" +
+    "<div class='scrolling-file-list'><table class='u-full-width'><thead><tr><th></th><th>Name</th><th>Date</th></tr></thead><tbody>" +
+    PAF_SAMPLE_FILES.map(function (f, i) {
+      return "<tr><td><input type='checkbox' class='paf-file-checkbox' id='paf-file-" + i + "' value='" + f[0] + "' checked></td>" +
+        "<td><label for='paf-file-" + i + "'>" + f[0] + " <span class='rec-size'>(" + f[1] + ")</span></label></td><td>" + f[2] + "</td></tr>";
+    }).join("") + "</tbody></table></div>" +
+    "<label for='paf_sequence'>Sequence</label>" +
+    "<select id='paf_sequence' name='paf_sequence' class='u-full-width' title='Chronological plays the oldest file first; Alphabetical sorts by file name; Random shuffles the order.'>" +
+    "<option value='chronological'>Chronological (oldest file first)</option><option value='alphabetical'>Alphabetical (by file name)</option><option value='random'>Random</option></select>" +
+    "<label for='paf_playlist' title='Play a playlist file&#39;s own files, in its own order, instead of the checked files above.'>Playlist</label>" +
+    "<select id='paf_playlist' name='paf_playlist' class='u-full-width' onchange='pafPlaylistChanged(this);'>" +
+    "<option value=''>None (use checked files and Sequence above)</option><option value='weekend.m3u'>weekend.m3u</option></select>" +
+    "<label for='paf_repeat' title='Loop through the folder continuously until you play something else.'><input type='checkbox' id='paf_repeat' name='paf_repeat' value='1'> Repeat indefinitely</label>" +
+    "<br><br><input class='twelve columns button button-primary' type='button' value='Listen' onclick=\"playAudioFilesListenButtonClicked(getElementById('playAudioFilesForm'));\" " +
+    "title='Play the selected folder&#39;s audio files through the live audio pipeline.'></form><br>&nbsp;<br>";
+
+  var SPEAK_RSS_HEADLINES_FORM_FIXTURE =
+    "<form class='speak_rss_headlines_form' id='speakRSSHeadlinesForm' onsubmit='event.preventDefault(); return false;' method='POST'>" +
+    "<label>Speak RSS Headlines</label>" +
+    "<p>Read the latest headlines from your subscribed feeds through the live audio pipeline (<code>PCMSpeechSynth</code> renders each headline, <code>PCMFilePlayer</code> plays them in turn).</p>" +
+    "<div class='scrolling-file-list'><table class='u-full-width'><thead><tr><th></th><th>Name</th><th>Feed URL</th></tr></thead><tbody>" +
+    FEEDS.map(function (f) {
+      return "<tr><td><input type='checkbox' class='rss-feed-checkbox' id='rss-feed-" + f.id + "' value='" + f.id + "' checked></td>" +
+        "<td><label for='rss-feed-" + f.id + "'><a onclick=\"loadContent('editrssfeed.html?id=" + f.id + "');\">" + f.name + "</a></label></td><td>" + f.url + "</td></tr>";
+    }).join("") + "</tbody></table></div>" +
+    "<div class='tts-select-actions'><input class='button' type='button' value='Add New Feed' onclick=\"loadContent('addrssfeedform.html');\">" +
+    "<label class='button' for='rss_opml_file'>Import OPML…</label>" +
+    "<input type='file' id='rss_opml_file' accept='.opml,.xml,text/xml' style='display:none;' onchange='importOPMLFeeds(this);'></div><br>&nbsp;<br>" +
+    "<label for='rss_items_per_feed' title='How many of each checked feed’s newest items to read.'>Items per feed</label>" +
+    "<input class='u-full-width' type='number' id='rss_items_per_feed' name='rss_items_per_feed' value='5' min='1' max='20'>" +
+    "<label for='rss_voice_mode'>Voice</label>" +
+    "<select id='rss_voice_mode' name='rss_voice_mode' class='u-full-width' onchange='rssVoiceModeChanged(this);' " +
+    "title='Per feed uses each feed’s own assigned voice (Configuration default when unset). Alternate switches between two voices item by item, like a pair of co-anchors.'>" +
+    "<option value='per_feed'>Use each feed's own voice</option><option value='alternate'>Alternate between two voices (co-anchors)</option></select>" +
+    "<div id='rss_alternate_voices' style='display:none;'><label for='rss_voice_a'>Voice A</label>" + voiceSelect("rss_voice_a", "") +
+    "<label for='rss_voice_b'>Voice B</label>" + voiceSelect("rss_voice_b", "") + "</div>" +
+    "<label for='rss_repeat' title='Loop through the same batch of headlines continuously until you play something else.'><input type='checkbox' id='rss_repeat' name='rss_repeat' value='1'> Repeat indefinitely</label>" +
+    "<br><br><input class='twelve columns button button-primary' type='button' value='Listen' onclick=\"speakRSSHeadlinesListenButtonClicked(getElementById('speakRSSHeadlinesForm'));\" " +
+    "title='Fetch the checked feeds and read their newest headlines through the live audio pipeline.'></form><br>&nbsp;<br>";
+
+  var ADD_RSS_FEED_FORM_FIXTURE =
+    "<form id='addRSSFeedForm' onsubmit=\"event.preventDefault(); return addRSSFeedRecord(this);\" method='POST'>" +
+    "<label for='rss_new_name'>Name<input class='u-full-width' type='text' id='rss_new_name' name='name' value='' placeholder='Feed name'></label>" +
+    "<label for='rss_new_url'>Feed URL<input class='u-full-width' type='text' id='rss_new_url' name='feed_url' value='' placeholder='https://…/rss'></label>" +
+    "<input class='twelve columns button button-primary' type='submit' value='Add New Feed'></form>";
+
+  function editRSSFeedForm() {
+    var f = byId(FEEDS, cur.feed);
+    return "<form id='editRSSFeedForm' onsubmit=\"event.preventDefault(); return storeRSSFeedRecord(this);\" method='POST'>" +
+      "<input type='hidden' name='id' value='" + f.id + "'>" +
+      wrapText("Name", "name", f.name) + wrapText("Feed URL", "feed_url", f.url) +
+      "<label>Voice" + voiceSelect("voice_identifier", f.voice) + "</label>" +
+      wrapSelect("Read Mode", "read_mode", f.mode, [["title", "Title only"], ["title_and_summary", "Title + summary"]]) +
+      "<br><br><input class='button button-primary' type='submit' value='Save'> " +
+      "<input class='button' type='button' value='Delete' onclick='deleteRSSFeedRecord(this.form);'></form>";
+  }
 
   var NOT_IN_PREVIEW =
     '<div style="max-width:520px;margin:1.5rem auto;padding:1rem 1.25rem;border:1px solid #d9b7b2;' +
@@ -508,10 +759,14 @@
     LOCALRADIO_ANIMATION: icon("AntennaHead-animation"),
     GQRX_TILE: GQRX_TILE,
 
-    CATEGORIES_TABLE: CATEGORIES_TABLE,
-    CATEGORY_TABLE: CATEGORIES_TABLE,
-    EDIT_CATEGORY_TABLE: CATEGORIES_TABLE,
-    FAVORITES_TABLE: FAVORITES_TABLE,
+    CATEGORIES_TABLE: CATEGORIES_TABLE_REAL,
+    CATEGORY_TABLE: categoryFavoritesTable,
+    EDIT_CATEGORY_TABLE: editCategoryTable,
+    SCAN_CATEGORY_BUTTON: scanCategoryButton,
+    EDIT_CATEGORY_LIST_BUTTON: function () { return catNavButton("editcategory.html", "Edit Frequencies List"); },
+    CATEGORY_SETTINGS_BUTTON: function () { return catNavButton("editcategorysettings.html", "Category Settings"); },
+    DELETE_CATEGORY_BUTTON: deleteCategoryButton,
+    FAVORITES_TABLE: FAVORITES_TABLE_REAL,
     SCANNER_CATEGORIES_TABLE: SCANNER_CATEGORIES_TABLE,
     RECORDINGS_LIST: RECORDINGS_LIST,
 
@@ -527,25 +782,26 @@
     CATEGORY_SELECT: CATEGORY_SELECT,
 
     TUNER_FORM: TUNER_FORM,
-    DEVICES_FORM: NOT_IN_PREVIEW,
+    DEVICES_FORM: DEVICES_FORM_FIXTURE,
     GQRX_FORM: GQRX_FORM,
     TEXT_TO_SPEECH_FORM: TEXT_TO_SPEECH_FORM,
-    PLAY_AUDIO_FILES_FORM: NOT_IN_PREVIEW,
-    SPEAK_RSS_HEADLINES_FORM: NOT_IN_PREVIEW,
-    ADD_RSS_FEED_FORM: NOT_IN_PREVIEW,
-    EDIT_RSS_FEED: NOT_IN_PREVIEW,
-    EDIT_FAVORITE: NOT_IN_PREVIEW,
-    EDIT_CATEGORY_SETTINGS: NOT_IN_PREVIEW,
-    VIEW_FAVORITE_ITEM: NOT_IN_PREVIEW,
+    PLAY_AUDIO_FILES_FORM: PLAY_AUDIO_FILES_FORM_FIXTURE,
+    SPEAK_RSS_HEADLINES_FORM: SPEAK_RSS_HEADLINES_FORM_FIXTURE,
+    ADD_RSS_FEED_FORM: ADD_RSS_FEED_FORM_FIXTURE,
+    EDIT_RSS_FEED: editRSSFeedForm,
+    EDIT_RSS_FEED_NAME: function () { return byId(FEEDS, cur.feed).name; },
+    EDIT_FAVORITE: editFavoriteForm,
+    EDIT_CATEGORY_SETTINGS: editCategorySettingsForm,
+    VIEW_FAVORITE_ITEM: viewFavoriteItem,
     VIEW_LISTEN: NOT_IN_PREVIEW,
     SCAN_CATEGORY: NOT_IN_PREVIEW,
     SCAN_CATEGORY_LISTEN: NOT_IN_PREVIEW,
 
-    CATEGORY_NAME: "Little Rock FM",
-    EDIT_CATEGORY_NAME: "Little Rock FM",
-    SCAN_CATEGORY_NAME: "Little Rock FM",
-    VIEW_FAVORITE_NAME: "KUAR-NPR Little Rock 89.1",
-    EDIT_FAVORITE_NAME: "KUAR-NPR Little Rock 89.1",
+    CATEGORY_NAME: function () { return byId(CATS, cur.cat).name; },
+    EDIT_CATEGORY_NAME: function () { return byId(CATS, cur.cat).name; },
+    SCAN_CATEGORY_NAME: function () { return byId(CATS, cur.cat).name; },
+    VIEW_FAVORITE_NAME: function () { return byId(FAVS, cur.fav).name; },
+    EDIT_FAVORITE_NAME: function () { return byId(FAVS, cur.fav).name; },
     LISTEN_NAME: "KUAR-NPR Little Rock 89.1",
     COMPUTER_NAME: "Mac-mini.local"
   };
@@ -567,10 +823,6 @@
     return '<tr><td>' + a + '</td><td>' + b + '</td><td>' +
       '<a class="button" onclick="loadContent(\'' + target + '\')">Open</a></td></tr>';
   }
-  function fav(name, freq) {
-    return '<tr><td>' + name + '</td><td>' + freq + '</td><td>' +
-      '<a class="button button-primary" onclick="window.__ahPreviewToast(\'Preview only — press Listen in the app\')">Listen</a></td></tr>';
-  }
   function rec(file, size) {
     return '<tr><td style="word-break:break-all">' + file + '</td><td>' + size + '</td><td>' +
       '<a class="button" onclick="window.__ahPreviewToast(\'Preview only — no recordings server\')">Play</a></td></tr>';
@@ -591,6 +843,17 @@
   function mockFor(method, url, body) {
     var u = String(url);
     method = String(method || "GET").toUpperCase();
+
+    // Remember which record a fragment URL asked for (viewfavorite.html?id=3 ...)
+    // so the token functions above render that record.
+    var idm = /([a-z]+)\.html\?(?:[^#]*&)?id=(\d+)/.exec(u);
+    if (idm) {
+      var n = parseInt(idm[2], 10);
+      if (idm[1] === "viewfavorite" || idm[1] === "editfavorite") cur.fav = n;
+      else if (/^(category|editcategory|editcategorysettings|scancategory)$/.test(idm[1])) cur.cat = n;
+      else if (idm[1] === "editrssfeed") cur.feed = n;
+    }
+    if (/editcategoryitem\.html/.test(u)) return { body: "", toast: "Preview only \u2014 category changes aren't saved" };
 
     // ControlBooth pages, and their actions (which stay on the same page).
     var cbPage = u.replace(/^.*\//, "").replace(/\?.*$/, "");
@@ -629,7 +892,7 @@
       return { body: JSON.stringify({ seconds: audioDelay }) };
     }
 
-    if (method === "POST" && /(listenbuttonclicked|insertnewfrequency|storefrequency|deletefrequency|storecategory|addcategory|deletecategory|applyaacsettings|applywebuitheme|texttospeechchoosefolder|speaktextbuttonclicked)\.html$/.test(u)) {
+    if (method === "POST" && /(listenbuttonclicked|insertnewfrequency|storefrequency|deletefrequency|storecategory|addcategory|deletecategory|applyaacsettings|applywebuitheme|texttospeechchoosefolder|speaktextbuttonclicked|storerssfeed|deleterssfeed|addrssfeed|importopmlfeeds)\.html$/.test(u)) {
       return { body: "", toast: "Preview only — this action needs the AntennaHead app" };
     }
     return null;
