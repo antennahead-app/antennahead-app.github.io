@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airport scanner project</title>
+<meta name="description" content="Set up AntennaHead as an aviation-band scanner for your local airport: find the frequencies, save them as Favorites, group them in a Category, and set the squelch with Now Playing.">
+<link rel="icon" type="image/svg+xml" href="assets/img/antennahead-icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/antennahead-icon-32.png">
+<link rel="apple-touch-icon" href="assets/img/antennahead-icon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-nav="projects.html">
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="./"><img class="mark" src="assets/img/antennahead-icon.svg" alt="" width="24" height="24"> AntennaHead</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="antennahead.html">AntennaHead</a>
+      <a href="controlbooth.html">ControlBooth</a>
+      <a href="rtl-sdr.html">RTL-SDR?</a>
+      <a href="projects.html">Projects</a>
+      <a href="demo/index.html">Live UI demo</a>
+      <a href="https://github.com/dsward2/AntennaHead">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill">Project 2</span>
+      <h1>An aviation-band scanner for your local airport</h1>
+      <p class="lede">
+        Find your airport&rsquo;s frequencies, save them as Favorites, group them in a
+        Category, and let AntennaHead scan them. You can try the pages involved in the
+        <a href="demo/index.html" target="_blank" rel="noopener">live UI demo</a>.
+      </p>
+      <div class="cta-row">
+        <a class="btn" href="projects.html">&larr; All projects</a>
+        <a class="btn primary" href="shell-script-source.html">Next: shell script source &rarr;</a>
+      </div>
+    </div>
+  </section>
+  <section class="band" id="airport">
+    <div class="wrap">
+      <h2>Overview</h2>
+      <p class="sub">
+        Aircraft and air traffic control talk on AM voice channels between
+        118 and 137&nbsp;MHz, a range an <a href="rtl-sdr.html">RTL-SDR radio</a>
+        receives well. In this project you&rsquo;ll look up the frequencies
+        for the airport nearest you, save each one as a Favorite, collect them
+        in a Category, and let AntennaHead scan the whole set and stop
+        whenever someone is talking. Listening is receive-only, and you can do it
+        from any device on your network.
+      </p>
+      <p class="note">
+        <b>You&rsquo;ll need:</b> AntennaHead running with an RTL-SDR Blog V3
+        and an antenna. The telescopic whip that comes with the radio works
+        for aircraft or towers within a few miles; for a longer range, use an
+        outdoor antenna made for the airband. You&rsquo;ll hear
+        the strongest signals, usually the tower and the approach and
+        departure controllers, first.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 1: Find your airport&rsquo;s frequencies</h2>
+      <p class="sub">
+        Look up an airport near you and write down the frequency for each
+        service it uses. Good free sources:
+      </p>
+      <div class="grid">
+        <div class="card"><h3><a href="https://www.radioreference.com/">RadioReference.com</a></h3><p>Search by state, county and airport. Airport pages list tower, ground, clearance delivery, approach, departure and ATIS, along with the type of modulation. Some details are free; others need a paid account.</p></div>
+        <div class="card"><h3><a href="https://www.airnav.com/airports/">AirNav.com</a></h3><p>Enter an airport&rsquo;s identifier (for example KLIT) to see its communications frequencies, with no account required.</p></div>
+        <div class="card"><h3>What you&rsquo;ll typically find</h3><p><b>ATIS</b> (a looping weather recording), <b>Clearance Delivery</b>, <b>Ground</b>, <b>Tower</b>, and <b>Approach</b>/<b>Departure</b>. Larger airports often have several approach and departure frequencies, one for each direction or altitude.</p></div>
+      </div>
+      <p class="note">
+        Airband voice is <b>AM</b>, not FM. The frequencies are
+        in MHz, such as 118.700.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 2: Save each frequency as a Favorite</h2>
+      <p class="sub">
+        Use the Airband Tuner to enter a frequency, and save it so you can
+        return to it with one tap.
+      </p>
+      <div class="grid">
+        <div class="card"><h3>1. Open the Airband Tuner</h3><p>Go to <b>Radio &rarr; Tuner</b> and tap <b>Airband</b>, which is set up for AM and the 108&ndash;400&nbsp;MHz range.</p></div>
+        <div class="card"><h3>2. Enter the frequency</h3><p>Type a <b>Station Name</b> such as &ldquo;Tower&rdquo;, then tap the digits of the <b>Frequency</b>. Use + and &minus; to nudge it.</p></div>
+        <div class="card"><h3>3. Try it</h3><p>Tap <b>Listen</b> to confirm you can hear it. If it&rsquo;s a busy frequency, you&rsquo;ll hear a transmission within a few minutes.</p></div>
+        <div class="card"><h3>4. Add it as a Favorite</h3><p>Choose a category in <b>Add to category</b> if you&rsquo;ve already made one, then tap <b>Add New Favorite Frequency</b>. Repeat for each frequency on your list.</p></div>
+      </div>
+      <p class="note">
+        Name each Favorite with the airport and the service, for example
+        &ldquo;KLIT Tower&rdquo; or &ldquo;KLIT Approach&rdquo;, because those names appear in
+        the scanner and on Now Playing.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 3: Group them into a Category</h2>
+      <p class="sub">
+        A Category is a named collection of Favorites, and it&rsquo;s what the
+        scanner steps through.
+      </p>
+      <div class="grid">
+        <div class="card"><h3>Create the Category</h3><p>Go to <b>Radio &rarr; Categories</b> and tap <b>Add New Category</b>. Name it for the airport, such as &ldquo;KLIT Airport&rdquo;.</p></div>
+        <div class="card"><h3>Add your Favorites</h3><p>Put the Favorites for Clearance Delivery, Ground, Tower, Approach, Departure and so on into it, using the <b>Add to category</b> menu when you save a Favorite in the tuner, or on a Favorite&rsquo;s Edit page.</p></div>
+        <div class="card"><h3>Turn on scanning</h3><p>Open <b>Category Settings</b> and set <b>Enable Category Scanning</b> to <b>Enabled</b>. Set <b>Modulation</b> to AM, since the settings here apply to every frequency in the Category. Then tap <b>Save Changes</b>.</p></div>
+      </div>
+      <p class="note">
+        Keep one Category per airport, or per job. You could make a second
+        one for a different airport, or an &ldquo;Emergency and guard&rdquo; Category
+        for 121.500.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 4: Scan, and set the squelch with Now Playing</h2>
+      <p class="sub">
+        Squelch is the volume gate that keeps the audio silent until a signal
+        is strong enough. If it&rsquo;s too low, you&rsquo;ll hear hiss and the scanner
+        will stop on noise. If it&rsquo;s too high, you&rsquo;ll miss weaker
+        transmissions. The Now Playing page shows you the numbers to set it by.
+      </p>
+      <div class="grid">
+        <div class="card"><h3>1. Start the scan</h3><p>Open your Category and tap <b>Scan All Frequencies</b>. AntennaHead steps through the Favorites and stops on one when a signal crosses the squelch level.</p></div>
+        <div class="card"><h3>2. Open Now Playing</h3><p>Now Playing shows the current <b>frequency</b>, the <b>signal level</b> and the <b>squelch level</b>, updating as the scanner moves. In scan mode the squelch is the one under <b>Category Scanner Settings</b>.</p></div>
+        <div class="card"><h3>3. Read the quiet level</h3><p>Watch the signal level between transmissions. That&rsquo;s the noise floor of your antenna and location.</p></div>
+        <div class="card"><h3>4. Read the talking level</h3><p>When someone transmits, the signal level jumps up. Note the lowest value that you still want to hear.</p></div>
+        <div class="card"><h3>5. Set the squelch between</h3><p>In <b>Category Settings</b>, set <b>Squelch Level</b> to a value just above the noise floor and below the transmissions. Tap <b>Save Changes</b>, then scan again and check Now Playing.</p></div>
+        <div class="card"><h3>6. Adjust the delay</h3><p><b>Squelch Delay</b> sets how long the scanner holds on a frequency after the signal drops. Raise it so a controller&rsquo;s reply isn&rsquo;t cut off, lower it so the scan moves on faster.</p></div>
+      </div>
+      <p class="note">
+        Not every squelch value suits every frequency. A distant tower may
+        need a lower setting than the one next door. If the scanner keeps stopping on
+        noise, raise the squelch a little at a time; if you&rsquo;re missing calls, lower it. To tune
+        one Favorite by itself, use its own <b>Squelch Level</b> under Edit.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Tips</h2>
+      <div class="grid">
+        <div class="card"><h3>Read it as you listen</h3><p>Turn on Live Captions in the <a href="antennahead.html#videos">scanner clip</a> to see the radio chatter as text.</p></div>
+        <div class="card"><h3>Listen on any device</h3><p>The scanner&rsquo;s audio streams to your iPhone, Apple Watch or Apple TV, so you can leave the Mac and RTL-SDR radio at home and carry the stream with you.</p></div>
+        <div class="card"><h3>Record the good stuff</h3><p>Use the Recordings screen to capture the stream to a file and play it back later.</p></div>
+      </div>
+      <p class="sub" style="margin-top:1.6em">
+        <a class="btn primary" href="demo/index.html#categories.html" target="_blank" rel="noopener">Try Categories in the demo &rarr;</a>
+        <a class="btn" href="antennahead.html">AntennaHead overview</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    &copy; <span data-year>2026</span> Douglas S. Ward &middot;
+    Built on <a href="https://github.com/dsward2/LocalRadio">LocalRadio</a> &middot;
+    <a href="demo/credits.html">Credits &amp; licenses</a>
+  </div>
+</footer>
+
+<script src="assets/js/nav.js"></script>
+</body>
+</html>

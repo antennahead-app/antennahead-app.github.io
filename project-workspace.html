@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workspace project</title>
+<meta name="description" content="Use the antennahead-workspace project on GitHub to create one umbrella folder with every AntennaHead repository checked out side by side, ready to build in Xcode.">
+<link rel="icon" type="image/svg+xml" href="assets/img/antennahead-icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/antennahead-icon-32.png">
+<link rel="apple-touch-icon" href="assets/img/antennahead-icon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-nav="projects.html">
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="./"><img class="mark" src="assets/img/antennahead-icon.svg" alt="" width="24" height="24"> AntennaHead</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="antennahead.html">AntennaHead</a>
+      <a href="controlbooth.html">ControlBooth</a>
+      <a href="rtl-sdr.html">RTL-SDR?</a>
+      <a href="projects.html">Projects</a>
+      <a href="demo/index.html">Live UI demo</a>
+      <a href="https://github.com/dsward2/AntennaHead">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill">Project 1 &middot; Build from source</span>
+      <h1>Set up the AntennaHead workspace</h1>
+      <p class="lede">
+        AntennaHead is a suite of separate GitHub projects that build on each
+        other. The <a href="https://github.com/dsward2/antennahead-workspace">antennahead-workspace</a>
+        project is a small &ldquo;umbrella&rdquo;: a list of the projects plus a script that
+        clones them all into one folder, laid out the way Xcode needs.
+      </p>
+      <div class="cta-row">
+        <a class="btn" href="projects.html">&larr; All projects</a>
+        <a class="btn primary" href="project-airport-scanner.html">Next: airport scanner &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Why use it</h2>
+      <p class="sub">
+        AntennaHead and ControlBooth use several of the other projects as
+        <b>local Swift packages</b>, found by relative path (for example
+        <code>../PipelineHelpers</code>). Those paths only resolve when every
+        project sits in the same parent folder. Cloning the projects one at a time
+        into random places makes Xcode fail to find them, or quietly fall back to
+        a copy from GitHub instead of your local one. The workspace script builds the
+        right layout for you.
+      </p>
+      <p class="note">
+        <b>You&rsquo;ll need:</b> a Mac running macOS 14 (Sonoma) or later,
+        Xcode 15 or later, and <code>git</code> (it comes with Xcode&rsquo;s command line tools).
+        An <a href="rtl-sdr.html">RTL-SDR radio</a> is optional for building; you only need one to tune over-the-air stations.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 1: Make the umbrella folder and run the script</h2>
+      <p class="sub">
+        Pick a place for everything. The folder name doesn&rsquo;t matter; this
+        example calls it <code>antennahead-umbrella</code>. The script clones
+        each project as a <b>sibling</b> of <code>antennahead-workspace</code>, so
+        the workspace project goes inside the umbrella folder first.
+      </p>
+<pre><code>mkdir antennahead-umbrella
+cd antennahead-umbrella
+git clone https://github.com/dsward2/antennahead-workspace.git
+./antennahead-workspace/bootstrap.sh</code></pre>
+      <p class="sub">
+        The script reads <code>repos.txt</code> and prints
+        <code>== AntennaHead: cloning ==</code> and so on for each project. It ends with
+        <code>Done. Repos are siblings of: &hellip;</code>. Run it from anywhere; it
+        puts the projects next to <code>antennahead-workspace</code>, not in your current folder.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 2: What you get</h2>
+      <p class="sub">
+        Each project is its own independent git repository with its own history,
+        issues and pull requests. The workspace only holds the list.
+      </p>
+<pre><code>antennahead-umbrella/
+  antennahead-workspace/   the manifest and bootstrap script
+  AntennaHead/             the sandboxed macOS app
+  ControlBooth/            the unsandboxed companion app
+  LiveAudioServer/         the streaming server
+  PipelineHelpers/         shared pipeline tools
+  SharedLogging/           shared log viewer
+  AirPlayReceiver/         AirPlay audio receiver package
+  antennahead-librtlsdr/   RTL-SDR driver build
+  AntennaHeadAPI/          JSON API types for the native apps
+  AntennaHeadTV/           Apple TV app
+  AntennaHeadiOS/          iPhone, iPad and Apple Watch apps
+  AntennaHeadUninstaller/  cleanup tool
+  StationDirector/         station automation prototype</code></pre>
+      <div class="grid">
+        <div class="card"><h3>The two Mac apps</h3><p><a href="antennahead.html">AntennaHead</a> and <a href="controlbooth.html">ControlBooth</a> are the ones most people build.</p></div>
+        <div class="card"><h3>Shared packages</h3><p>PipelineHelpers, SharedLogging, AirPlayReceiver and LiveAudioServer are used by the apps as local packages.</p></div>
+        <div class="card"><h3>Clients and tools</h3><p>AntennaHeadTV, AntennaHeadiOS (with the Apple Watch app), AntennaHeadAPI, the Uninstaller and StationDirector are optional extras.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 3: Open and build</h2>
+      <div class="grid">
+        <div class="card"><h3>AntennaHead</h3><p>Open <code>AntennaHead/AntennaHead.xcodeproj</code> in Xcode, choose the <b>AntennaHead</b> scheme with your Mac as the destination, and press <b>&#8984;R</b>. Swift Package Manager fetches the other dependencies on the first build.</p></div>
+        <div class="card"><h3>ControlBooth</h3><p>Open <code>ControlBooth/ControlBooth.xcodeproj</code>. The project&rsquo;s <code>SETUP.md</code> explains its helper tools and the build phases that embed them.</p></div>
+        <div class="card"><h3>The other projects</h3><p>Each has its own README with build notes. Open the <code>.xcodeproj</code> or package in its folder.</p></div>
+      </div>
+      <p class="note">
+        If Xcode says a package can&rsquo;t be found, check that the project folders really are siblings
+        (<code>ls</code> in the umbrella folder should list them all).
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 4: Keep it up to date</h2>
+      <p class="sub">
+        Run the script again any time. For a project that&rsquo;s already cloned it
+        <b>fetches</b> the latest changes without changing your files, so follow it with a
+        pull in the projects you want to update:
+      </p>
+<pre><code>./antennahead-workspace/bootstrap.sh
+git -C AntennaHead pull --ff-only
+git -C ControlBooth pull --ff-only</code></pre>
+      <p class="sub">
+        To update every project at once, run this in the umbrella folder. It
+        skips any project with local changes it can&rsquo;t fast-forward over:
+      </p>
+<pre><code>for d in */; do git -C "$d" pull --ff-only; done</code></pre>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Changing or adding projects</h2>
+      <div class="grid">
+        <div class="card"><h3>Contributing</h3><p>Because every project is its own repository, make changes and open pull requests in the project you changed, not in the workspace.</p></div>
+        <div class="card"><h3>Adding a project</h3><p>To add a project to the suite, add a line to <code>repos.txt</code> in the form <code>name&nbsp; url&nbsp; ref</code>, and the script will clone it too.</p></div>
+        <div class="card"><h3>More reference</h3><p>The workspace also holds <code>NETWORK_PORTS.md</code>, a map of every port the suite opens, and design notes.</p></div>
+      </div>
+      <p class="sub" style="margin-top:1.6em">
+        <a class="btn primary" href="https://github.com/dsward2/antennahead-workspace">antennahead-workspace on GitHub &rarr;</a>
+        <a class="btn" href="projects.html">All projects</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    &copy; <span data-year>2026</span> Douglas S. Ward &middot;
+    Built on <a href="https://github.com/dsward2/LocalRadio">LocalRadio</a> &middot;
+    <a href="demo/credits.html">Credits &amp; licenses</a>
+  </div>
+</footer>
+
+<script src="assets/js/nav.js"></script>
+</body>
+</html>

@@ -259,3 +259,8 @@ table.stages th { background: var(--bg-3); }
 figure.shot { margin: 0 0 1.4em; max-width: 760px; }
 figure.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 10px; }
 figure.shot figcaption { padding-top: 10px; font-size: .88rem; color: var(--fg-3); }
+
+/* ---- linked cards (projects index) ---- */
+a.card { display: block; color: inherit; }
+a.card:hover { text-decoration: none; border-color: var(--fg-3); }
+a.card h3 { color: var(--accent); }
