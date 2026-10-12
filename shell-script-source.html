@@ -137,6 +137,10 @@ exec "$RTL_FM" -d "$DEVICE" "${ARGS[@]}" \
         <tr><td>2</td><td><code>sox</code></td><td><code>-t</code>, <code>raw</code>, <code>-r</code>, <code>48000</code>, <code>-e</code>, <code>signed-integer</code>, <code>-b</code>, <code>16</code>, <code>-c</code>, <code>1</code>, <code>-</code>,<br><code>-t</code>, <code>raw</code>, <code>-r</code>, <code>48000</code>, <code>-e</code>, <code>signed-integer</code>, <code>-b</code>, <code>16</code>, <code>-c</code>, <code>2</code>, <code>-</code></td></tr>
         <tr><td>3</td><td><code>PCMUDPSender</code></td><td>added by ControlBooth; you don&rsquo;t add it</td></tr>
       </table>
+      <figure class="shot">
+        <img src="assets/img/controlbooth-pipeline-editor.png" width="1068" height="800" alt="ControlBooth's pipeline editor showing a pipeline with Destination Host 127.0.0.1 and Destination Port 6019. Stage one is run-uca.sh, a shell script given by its full path, with the argument --stdout. Stage two is sox, with its arguments listed one per row.">
+        <figcaption>The pipeline editor. Stage one is a shell script (<code>run-uca.sh</code>, given by its full path, with the argument <code>--stdout</code>). Stage two is <code>sox</code>, with one argument per row. This is the author&rsquo;s own scanner script, which follows the same pattern as the one above.</figcaption>
+      </figure>
       <p class="sub">
         The first group of <code>sox</code> arguments describes what comes
         in (mono), and the second what goes out (stereo). Both are 48&nbsp;kHz,
