@@ -59,7 +59,7 @@
       </p>
       <div class="grid">
         <div class="card"><h3>Your script</h3><p>Starts <code>rtl_fm</code> with your frequencies, gain and squelch, and prints 16-bit PCM audio on stdout. Everything else it says goes to stderr.</p></div>
-        <div class="card"><h3>sox</h3><p>Turns the script&rsquo;s mono audio into the 48&nbsp;kHz, 2-channel, 16-bit format the receiving end requires. ControlBooth doesn&rsquo;t convert for you.</p></div>
+        <div class="card"><h3>sox</h3><p>Turns the script&rsquo;s 12&nbsp;kHz mono audio into the 48&nbsp;kHz, 2-channel, 16-bit format the receiving end requires. ControlBooth doesn&rsquo;t convert for you.</p></div>
         <div class="card"><h3>PCMUDPSender</h3><p>Added automatically by ControlBooth. It sends the audio to AntennaHead (port 6019 by default), which streams it to listeners.</p></div>
       </div>
       <p class="note">
@@ -75,48 +75,53 @@
     <div class="wrap">
       <h2>Step 1: Write the script</h2>
       <p class="sub">
-        This one scans the seven NOAA Weather Radio channels
-        with a squelch, so it only produces sound when something is being
-        transmitted. Save it as, for example,
-        <code>~/bin/scan.sh</code>, and change the frequencies to the ones
-        you want.
+        This one scans five Little Rock Adams Field (KLIT) airband channels: tower, clearance delivery, approach/departure and ground
+        with a squelch, so it only produces sound when someone is
+        transmitting. Save it as, for example,
+        <code>~/bin/airband-scan.sh</code>, and change the frequencies to the ones
+        for your own airport.
       </p>
 <pre><code>#!/usr/bin/env bash
-# Squelched rtl_fm frequency scan. PCM16LE, 48 kHz, mono on stdout.
-# Messages go to stderr, because stdout is the audio.
+# Squelched rtl_fm airband (AM) scan of Little Rock Adams Field. PCM16LE, 12 kHz,
+# mono on stdout (a sox stage resamples it to 48 kHz stereo). Messages go to
+# stderr, because stdout is the audio.
 set -euo pipefail
 
 # ControlBooth is a GUI app, so it starts scripts with a short PATH.
 export PATH="/opt/local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-DEVICE=${DEVICE:-0}          # RTL-SDR index (see rtl_test)
-GAIN=${GAIN:-40}             # tuner gain in dB
-SQUELCH=${1:-${SQUELCH:-30}} # first argument wins; raise it if it opens on noise
-STATUS_PORT=${STATUS_PORT:-6021}
-FREQS=(${FREQS:-162.400M 162.425M 162.450M 162.475M 162.500M 162.525M 162.550M})
+DEVICE=${DEVICE:-0}                # RTL-SDR index (see rtl_test)
+GAIN=${GAIN:-30}                   # tuner gain in dB
+MODE=${MODE:-am}                   # airband voice is AM
+SQUELCH=${1:-${SQUELCH:-130}}      # first argument wins; raise it if it opens on noise
+STATUS_PORT=${STATUS_PORT:-6021}   # AntennaHead's Now Playing status port
+# Adams Field: Tower, Clearance Delivery, Approach/Departure, Ground, Approach/Departure
+FREQS=(${FREQS:-118.7M 118.95M 119.5M 121.9M 135.4M})
 
 RTL_FM=/Applications/ControlBooth.app/Contents/Helpers/rtl_fm_localradio
 
 ARGS=()
 for f in "${FREQS[@]}"; do ARGS+=(-f "$f"); done
 
-echo "Scanning ${FREQS[*]} on device $DEVICE, squelch $SQUELCH" >&2
+echo "Scanning ${FREQS[*]} on device $DEVICE, squelch $SQUELCH" &gt;&amp;2
 
 exec "$RTL_FM" -d "$DEVICE" "${ARGS[@]}" \
-     -M fm -s 12k -r 48k -E pad \
-     -g "$GAIN" -l "$SQUELCH" -c "$STATUS_PORT" -</code></pre>
+     -M "$MODE" -s 12k -E pad \
+     -g "$GAIN" -l "$SQUELCH" -c "$STATUS_PORT" -
+</code></pre>
       <p class="sub">Then make it executable:</p>
-<pre><code>chmod +x ~/bin/scan.sh</code></pre>
+<pre><code>chmod +x ~/bin/airband-scan.sh</code></pre>
       <div class="grid">
-        <div class="card"><h3>-f (repeat it)</h3><p>Each <code>-f</code> adds a frequency to the scan list. Use <code>-M am</code> instead of <code>-M fm</code> for AM signals such as airband.</p></div>
+        <div class="card"><h3>-f (repeat it)</h3><p>Each <code>-f</code> adds a frequency to the scan list. Use <code>MODE=fm</code> for FM channels such as NOAA Weather Radio (162.475&nbsp;MHz).</p></div>
         <div class="card"><h3>-l squelch</h3><p>The squelch level. Audio only comes out while the signal is stronger than this, which is what makes it a scanner.</p></div>
         <div class="card"><h3>-E pad</h3><p>While the squelch is closed, <code>rtl_fm</code> sends silence instead of nothing, so the pipeline keeps a steady flow of audio.</p></div>
         <div class="card"><h3>-c port</h3><p>Sends the current frequency and signal power to this UDP port. AntennaHead listens on 6021 by default, which is how Now Playing can show a live signal level beside the squelch.</p></div>
         <div class="card"><h3>-d device</h3><p>Which RTL-SDR to use, by index. With more than one radio plugged in, look up the one you want and pass its index.</p></div>
+        <div class="card"><h3>No -r here</h3><p><code>rtl_fm</code> has an <code>-r</code> option to resample its output, but in testing <code>rtl_fm_localradio</code> produced only silence with it at these narrow-band rates. The <code>sox</code> stage does the resampling instead.</p></div>
         <div class="card"><h3>The trailing -</h3><p>Tells <code>rtl_fm</code> to write the audio to stdout, where the next pipeline stage picks it up.</p></div>
       </div>
       <p class="note">
-        Test it in Terminal first: <code>~/bin/scan.sh | ffplay -f s16le -ar 48000 -ac 1 -nodisp -</code>
+        Test it in Terminal first: <code>~/bin/airband-scan.sh | ffplay -f s16le -ar 12000 -ac 1 -nodisp -</code>
         (ffplay comes with ffmpeg; any player that reads raw audio will do). If you can hear it there, it will work as a pipeline stage.
         If you can&rsquo;t, the error messages in Terminal will tell you why.
       </p>
@@ -134,17 +139,17 @@ exec "$RTL_FM" -d "$DEVICE" "${ARGS[@]}" \
       <table class="stages">
         <tr><th>Stage</th><th>Tool</th><th>Arguments (one per row)</th></tr>
         <tr><td>1</td><td><code>/Users/you/bin/scan.sh</code><br>(the full path to your script)</td><td>optional: a squelch level such as <code>30</code></td></tr>
-        <tr><td>2</td><td><code>sox</code></td><td><code>-t</code>, <code>raw</code>, <code>-r</code>, <code>48000</code>, <code>-e</code>, <code>signed-integer</code>, <code>-b</code>, <code>16</code>, <code>-c</code>, <code>1</code>, <code>-</code>,<br><code>-t</code>, <code>raw</code>, <code>-r</code>, <code>48000</code>, <code>-e</code>, <code>signed-integer</code>, <code>-b</code>, <code>16</code>, <code>-c</code>, <code>2</code>, <code>-</code></td></tr>
+        <tr><td>2</td><td><code>sox</code></td><td><code>-V2</code>, <code>-q</code>, <code>--buffer</code>, <code>960</code>,<br><code>-r</code>, <code>12000</code>, <code>-e</code>, <code>signed-integer</code>, <code>-b</code>, <code>16</code>, <code>-c</code>, <code>1</code>, <code>-t</code>, <code>raw</code>, <code>-</code>,<br><code>-r</code>, <code>48000</code>, <code>-e</code>, <code>signed-integer</code>, <code>-b</code>, <code>16</code>, <code>-c</code>, <code>2</code>, <code>-t</code>, <code>raw</code>, <code>-</code></td></tr>
         <tr><td>3</td><td><code>PCMUDPSender</code></td><td>added by ControlBooth; you don&rsquo;t add it</td></tr>
       </table>
       <figure class="shot">
-        <img src="assets/img/controlbooth-pipeline-editor.png" width="1068" height="1029" alt="ControlBooth's pipeline editor, scrolled to the end of a wide-band FM pipeline. The last rows of the rtl_fm_localradio stage show -c 6021, -E pad and -f 92300000. Below it are a stereodemux stage with -r 170000 and a sox stage with its arguments listed one per row.">
-        <figcaption>The pipeline editor, showing one of ControlBooth&rsquo;s wide-band FM pipelines (KIPR-FM 92.3). At the top are the last arguments of the <code>rtl_fm_localradio</code> stage, including the same <code>-c</code>, <code>-E pad</code> and <code>-f</code> options the script above uses. Below it come <code>stereodemux</code> and <code>sox</code>, each with one argument per row. In your own pipeline, the script takes the place of the first stage.</figcaption>
+        <img src="assets/img/controlbooth-pipeline-editor.png" width="1068" height="1002" alt="ControlBooth's pipeline editor showing a pipeline named Little Rock Aviation Scanner, with Destination Host 127.0.0.1 and Destination Port 6019. Stage one is the shell script littlerock-airband.sh, given by its full path, with no arguments. Stage two is sox, with its arguments listed one per row: -V2, -q, --buffer 960, -r 12000, -e signed-integer, -b 16, -c 1, -t raw.">
+        <figcaption>The pipeline editor, showing this project&rsquo;s pipeline. Stage one is the shell script, given by its full path. Stage two is <code>sox</code>, with one argument per row. ControlBooth adds the final <code>PCMUDPSender</code> stage itself, so it isn&rsquo;t listed.</figcaption>
       </figure>
       <p class="sub">
         The first group of <code>sox</code> arguments describes what comes
-        in (mono), and the second what goes out (stereo). Both are 48&nbsp;kHz,
-        16-bit signed raw audio.
+        in (12&nbsp;kHz mono), and the second what goes out (48&nbsp;kHz
+        stereo). Both are 16-bit signed raw audio.
       </p>
       <p class="note">
         A stage that isn&rsquo;t one of ControlBooth&rsquo;s bundled tools needs its
@@ -160,7 +165,7 @@ exec "$RTL_FM" -d "$DEVICE" "${ARGS[@]}" \
       <h2>Step 3: Play it and set the squelch</h2>
       <div class="grid">
         <div class="card"><h3>1. Press Play</h3><p>Start the pipeline in ControlBooth. AntennaHead&rsquo;s Now Playing page shows it, and you can listen from the web player or any AntennaHead app.</p></div>
-        <div class="card"><h3>2. Watch the levels</h3><p>On Now Playing, compare the signal level in the quiet moments with the level while someone is talking. This is the same method as in the <a href="projects.html#airport">airport scanner project</a>.</p></div>
+        <div class="card"><h3>2. Watch the levels</h3><p>On Now Playing, compare the signal level in the quiet moments with the level while someone is talking. On the author&rsquo;s setup, with a gain of 30, the quiet level was about 90&ndash;120, so the script starts at a squelch of 130. This is the same method as in the <a href="projects.html#airport">airport scanner project</a>.</p></div>
         <div class="card"><h3>3. Change SQUELCH</h3><p>Put a new number in the script stage&rsquo;s argument row (see the note below), stop the pipeline, and start it again.</p></div>
       </div>
       <p class="note">
