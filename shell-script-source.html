@@ -138,8 +138,8 @@ exec "$RTL_FM" -d "$DEVICE" "${ARGS[@]}" \
         <tr><td>3</td><td><code>PCMUDPSender</code></td><td>added by ControlBooth; you don&rsquo;t add it</td></tr>
       </table>
       <figure class="shot">
-        <img src="assets/img/controlbooth-pipeline-editor.png" width="1068" height="800" alt="ControlBooth's pipeline editor showing a pipeline with Destination Host 127.0.0.1 and Destination Port 6019. Stage one is run-uca.sh, a shell script given by its full path, with the argument --stdout. Stage two is sox, with its arguments listed one per row.">
-        <figcaption>The pipeline editor. Stage one is a shell script (<code>run-uca.sh</code>, given by its full path, with the argument <code>--stdout</code>). Stage two is <code>sox</code>, with one argument per row. This is the author&rsquo;s own scanner script, which follows the same pattern as the one above.</figcaption>
+        <img src="assets/img/controlbooth-pipeline-editor.png" width="1068" height="1029" alt="ControlBooth's pipeline editor, scrolled to the end of a wide-band FM pipeline. The last rows of the rtl_fm_localradio stage show -c 6021, -E pad and -f 92300000. Below it are a stereodemux stage with -r 170000 and a sox stage with its arguments listed one per row.">
+        <figcaption>The pipeline editor, showing one of ControlBooth&rsquo;s wide-band FM pipelines (KIPR-FM 92.3). At the top are the last arguments of the <code>rtl_fm_localradio</code> stage, including the same <code>-c</code>, <code>-E pad</code> and <code>-f</code> options the script above uses. Below it come <code>stereodemux</code> and <code>sox</code>, each with one argument per row. In your own pipeline, the script takes the place of the first stage.</figcaption>
       </figure>
       <p class="sub">
         The first group of <code>sox</code> arguments describes what comes
