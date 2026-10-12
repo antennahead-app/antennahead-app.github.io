@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shell script source</title>
+<meta name="description" content="Use your own shell script running rtl_fm as an audio source in a ControlBooth pipeline, with the squelch and signal level showing on AntennaHead's Now Playing page.">
+<link rel="icon" type="image/svg+xml" href="assets/img/antennahead-icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/antennahead-icon-32.png">
+<link rel="apple-touch-icon" href="assets/img/antennahead-icon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-nav="projects.html">
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="./"><img class="mark" src="assets/img/antennahead-icon.svg" alt="" width="24" height="24"> AntennaHead</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="antennahead.html">AntennaHead</a>
+      <a href="controlbooth.html">ControlBooth</a>
+      <a href="rtl-sdr.html">RTL-SDR?</a>
+      <a href="projects.html">Projects</a>
+      <a href="demo/index.html">Live UI demo</a>
+      <a href="https://github.com/dsward2/AntennaHead">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill">Project 2 &middot; ControlBooth</span>
+      <h1>Use a shell script with rtl_fm as an audio source</h1>
+      <p class="lede">
+        <a href="controlbooth.html">ControlBooth</a> can run any executable as
+        the first stage of a pipeline, including a shell script you write
+        yourself. That lets you build your own scanner or receiver around
+        <code>rtl_fm</code> &mdash; any channel list, gain, or squelch you
+        like &mdash; and still listen on every device AntennaHead streams to.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="#script">The script &darr;</a>
+        <a class="btn" href="projects.html">All projects</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>How it fits together</h2>
+      <p class="sub">
+        A ControlBooth pipeline is a chain of programs: each stage&rsquo;s
+        output feeds the next stage&rsquo;s input. Your script is stage one.
+        It runs <code>rtl_fm</code> and writes raw audio to its standard
+        output. A <code>sox</code> stage converts that audio to the format
+        AntennaHead expects, and ControlBooth adds the last stage itself,
+        which sends the audio to AntennaHead over UDP.
+      </p>
+      <div class="grid">
+        <div class="card"><h3>Your script</h3><p>Starts <code>rtl_fm</code> with your frequencies, gain and squelch, and prints 16-bit PCM audio on stdout. Everything else it says goes to stderr.</p></div>
+        <div class="card"><h3>sox</h3><p>Turns the script&rsquo;s mono audio into the 48&nbsp;kHz, 2-channel, 16-bit format the receiving end requires. ControlBooth doesn&rsquo;t convert for you.</p></div>
+        <div class="card"><h3>PCMUDPSender</h3><p>Added automatically by ControlBooth. It sends the audio to AntennaHead (port 6019 by default), which streams it to listeners.</p></div>
+      </div>
+      <p class="note">
+        <b>You&rsquo;ll need:</b> ControlBooth and AntennaHead, an RTL-SDR
+        Blog V3, and the <code>rtl_fm_localradio</code> tool that ships inside
+        ControlBooth. Only one program can use a given RTL-SDR radio at a time, so
+        stop anything else that&rsquo;s using it first.
+      </p>
+    </div>
+  </section>
+
+  <section class="band" id="script">
+    <div class="wrap">
+      <h2>Step 1: Write the script</h2>
+      <p class="sub">
+        This one scans the seven NOAA Weather Radio channels
+        with a squelch, so it only produces sound when something is being
+        transmitted. Save it as, for example,
+        <code>~/bin/scan.sh</code>, and change the frequencies to the ones
+        you want.
+      </p>
+<pre><code>#!/usr/bin/env bash
+# Squelched rtl_fm frequency scan. PCM16LE, 48 kHz, mono on stdout.
+# Messages go to stderr, because stdout is the audio.
+set -euo pipefail
+
+# ControlBooth is a GUI app, so it starts scripts with a short PATH.
+export PATH="/opt/local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+DEVICE=${DEVICE:-0}          # RTL-SDR index (see rtl_test)
+GAIN=${GAIN:-40}             # tuner gain in dB
+SQUELCH=${1:-${SQUELCH:-30}} # first argument wins; raise it if it opens on noise
+STATUS_PORT=${STATUS_PORT:-6021}
+FREQS=(${FREQS:-162.400M 162.425M 162.450M 162.475M 162.500M 162.525M 162.550M})
+
+RTL_FM=/Applications/ControlBooth.app/Contents/Helpers/rtl_fm_localradio
+
+ARGS=()
+for f in "${FREQS[@]}"; do ARGS+=(-f "$f"); done
+
+echo "Scanning ${FREQS[*]} on device $DEVICE, squelch $SQUELCH" >&2
+
+exec "$RTL_FM" -d "$DEVICE" "${ARGS[@]}" \
+     -M fm -s 12k -r 48k -E pad \
+     -g "$GAIN" -l "$SQUELCH" -c "$STATUS_PORT" -</code></pre>
+      <p class="sub">Then make it executable:</p>
+<pre><code>chmod +x ~/bin/scan.sh</code></pre>
+      <div class="grid">
+        <div class="card"><h3>-f (repeat it)</h3><p>Each <code>-f</code> adds a frequency to the scan list. Use <code>-M am</code> instead of <code>-M fm</code> for AM signals such as airband.</p></div>
+        <div class="card"><h3>-l squelch</h3><p>The squelch level. Audio only comes out while the signal is stronger than this, which is what makes it a scanner.</p></div>
+        <div class="card"><h3>-E pad</h3><p>While the squelch is closed, <code>rtl_fm</code> sends silence instead of nothing, so the pipeline keeps a steady flow of audio.</p></div>
+        <div class="card"><h3>-c port</h3><p>Sends the current frequency and signal power to this UDP port. AntennaHead listens on 6021 by default, which is how Now Playing can show a live signal level beside the squelch.</p></div>
+        <div class="card"><h3>-d device</h3><p>Which RTL-SDR to use, by index. With more than one radio plugged in, look up the one you want and pass its index.</p></div>
+        <div class="card"><h3>The trailing -</h3><p>Tells <code>rtl_fm</code> to write the audio to stdout, where the next pipeline stage picks it up.</p></div>
+      </div>
+      <p class="note">
+        Test it in Terminal first: <code>~/bin/scan.sh | ffplay -f s16le -ar 48000 -ac 1 -nodisp -</code>
+        (ffplay comes with ffmpeg; any player that reads raw audio will do). If you can hear it there, it will work as a pipeline stage.
+        If you can&rsquo;t, the error messages in Terminal will tell you why.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 2: Build the pipeline in ControlBooth</h2>
+      <p class="sub">
+        In ControlBooth, add a new Pipeline and give it a name. Stages are
+        listed left to right, and each argument gets its own row. Arguments
+        are passed exactly as typed, with no shell, so don&rsquo;t add quotes.
+      </p>
+      <table class="stages">
+        <tr><th>Stage</th><th>Tool</th><th>Arguments (one per row)</th></tr>
+        <tr><td>1</td><td><code>/Users/you/bin/scan.sh</code><br>(the full path to your script)</td><td>optional: a squelch level such as <code>30</code></td></tr>
+        <tr><td>2</td><td><code>sox</code></td><td><code>-t</code>, <code>raw</code>, <code>-r</code>, <code>48000</code>, <code>-e</code>, <code>signed-integer</code>, <code>-b</code>, <code>16</code>, <code>-c</code>, <code>1</code>, <code>-</code>,<br><code>-t</code>, <code>raw</code>, <code>-r</code>, <code>48000</code>, <code>-e</code>, <code>signed-integer</code>, <code>-b</code>, <code>16</code>, <code>-c</code>, <code>2</code>, <code>-</code></td></tr>
+        <tr><td>3</td><td><code>PCMUDPSender</code></td><td>added by ControlBooth; you don&rsquo;t add it</td></tr>
+      </table>
+      <p class="sub">
+        The first group of <code>sox</code> arguments describes what comes
+        in (mono), and the second what goes out (stereo). Both are 48&nbsp;kHz,
+        16-bit signed raw audio.
+      </p>
+      <p class="note">
+        A stage that isn&rsquo;t one of ControlBooth&rsquo;s bundled tools needs its
+        <b>full path</b>. If the script won&rsquo;t start, check that the path is
+        right, that it begins with <code>#!</code>, and that you ran
+        <code>chmod +x</code>.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Step 3: Play it and set the squelch</h2>
+      <div class="grid">
+        <div class="card"><h3>1. Press Play</h3><p>Start the pipeline in ControlBooth. AntennaHead&rsquo;s Now Playing page shows it, and you can listen from the web player or any AntennaHead app.</p></div>
+        <div class="card"><h3>2. Watch the levels</h3><p>On Now Playing, compare the signal level in the quiet moments with the level while someone is talking. This is the same method as in the <a href="projects.html#airport">airport scanner project</a>.</p></div>
+        <div class="card"><h3>3. Change SQUELCH</h3><p>Put a new number in the script stage&rsquo;s argument row (see the note below), stop the pipeline, and start it again.</p></div>
+      </div>
+      <p class="note">
+        The script above takes the squelch as its first argument, so you
+        can put a number such as <code>45</code> in the script stage&rsquo;s argument
+        row instead of editing the file. Either way, a running pipeline
+        doesn&rsquo;t pick up changes: stop it and start it again.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Ideas</h2>
+      <div class="grid">
+        <div class="card"><h3>One script per list</h3><p>Keep a script for each scan list: a local airport, a county&rsquo;s public safety channels, the weather channels. Each becomes its own pipeline.</p></div>
+        <div class="card"><h3>Use another tool</h3><p>The script can start anything that prints PCM audio, not just <code>rtl_fm</code>, then pipe it through the same <code>sox</code> stage.</p></div>
+        <div class="card"><h3>Schedule it</h3><p>ControlBooth can schedule a pipeline to run and record at a set time, so your script&rsquo;s scan list is captured while you&rsquo;re away.</p></div>
+      </div>
+      <p class="sub" style="margin-top:1.6em">
+        <a class="btn primary" href="controlbooth.html">About ControlBooth &rarr;</a>
+        <a class="btn" href="projects.html">All projects</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    &copy; <span data-year>2026</span> Douglas S. Ward &middot;
+    Built on <a href="https://github.com/dsward2/LocalRadio">LocalRadio</a> &middot;
+    <a href="demo/credits.html">Credits &amp; licenses</a>
+  </div>
+</footer>
+
+<script src="assets/js/nav.js"></script>
+</body>
+</html>

@@ -246,3 +246,11 @@ figure.concept figcaption { padding: 12px 18px 16px; font-size: .88rem; color: v
 }
 :root[data-theme="dark"] figure.concept .concept-light { display: none; }
 :root[data-theme="dark"] figure.concept .concept-dark  { display: block; filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
+
+/* ---- code blocks ---- */
+pre { background: var(--bg-3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+      overflow-x: auto; font-size: .85rem; line-height: 1.5; max-width: 760px; }
+pre code { background: none; padding: 0; font-size: inherit; }
+table.stages { border-collapse: collapse; margin: 0 0 1em; max-width: 760px; width: 100%; font-size: .92rem; }
+table.stages th, table.stages td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+table.stages th { background: var(--bg-3); }

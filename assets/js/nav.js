@@ -1,7 +1,7 @@
 // Tiny shared helpers for the project site.
 (function () {
   // Mark the current page in the nav.
-  var here = location.pathname.split("/").pop() || "index.html";
+  var here = document.body.dataset.nav || location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll(".site-nav a").forEach(function (a) {
     var target = a.getAttribute("href");
     if (target === here || (here === "index.html" && target === "./")) {
